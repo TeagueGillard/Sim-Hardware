@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35431.28
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sim Wheel Config", "Sim Wheel Config.csproj", "{07348C72-4812-4DBD-8D9B-695307E3CBC6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07348C72-4812-4DBD-8D9B-695307E3CBC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07348C72-4812-4DBD-8D9B-695307E3CBC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07348C72-4812-4DBD-8D9B-695307E3CBC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07348C72-4812-4DBD-8D9B-695307E3CBC6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C67F9159-3B0E-4103-A196-1B1307EE39AA}
+	EndGlobalSection
+EndGlobal
