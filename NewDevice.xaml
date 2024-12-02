@@ -9,7 +9,9 @@
     xmlns:local="clr-namespace:Sim_Wheel_Config"
     mc:Ignorable="d"
     Title="Sim Hardware | ALPHA  -  Add New Device"
-    ResizeMode="NoResize">
+    ResizeMode="NoResize"
+    Icon="Resources\1212313123123213213123123213123123131_KOS_icon.ico">
+    
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
             <GradientStop Color="#FF121220"/>
