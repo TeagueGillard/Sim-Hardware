@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
@@ -16,13 +17,16 @@ using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Linq;
 using Path = System.IO.Path;
+using Xceed.Wpf.AvalonDock;
+using Xceed.Wpf.Toolkit;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Sim_Wheel_Config
 {
 
     public partial class MainWindow : Window
     {
-
+        private SerialPort _serialPort;
         private DispatcherTimer _timer;
         private int totalDevices = 0;
         private int deviceNumber = 0;
@@ -35,6 +39,7 @@ namespace Sim_Wheel_Config
         private string MainWindowDisplayDeviceComPort = "0";
         private string MainWindowDisplayCurrentDeviceComPort = "No Device";
         private FileSystemWatcher fileWatcher;
+        private ColorPicker colorPicker;
 
         private void InitializeFileWatcher()
         {
@@ -105,7 +110,6 @@ namespace Sim_Wheel_Config
             string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
             string filePath = System.IO.Path.Combine(folderPath, "devices.xml");
 
-            // Clear existing children that match specific criteria (labels/buttons added by UpdateDevices)
             List<UIElement> elementsToRemove = MainGrid.Children
                 .OfType<UIElement>()
                 .Where(child =>
@@ -121,7 +125,7 @@ namespace Sim_Wheel_Config
             if (System.IO.File.Exists(filePath))
             {
                 XDocument doc = XDocument.Load(filePath);
-                int verticalPosition = 80;
+                int verticalPosition = 70;
 
                 foreach (XElement device in doc.Descendants("Device"))
                 {
@@ -134,7 +138,7 @@ namespace Sim_Wheel_Config
                     {
                         MainGrid.Children.Add(new Label()
                         {
-                            Tag = "DeviceLabel", // Tag to identify dynamically added labels
+                            Tag = "DeviceLabel",
                             Content = deviceName,
                             HorizontalAlignment = HorizontalAlignment.Left,
                             VerticalAlignment = VerticalAlignment.Top,
@@ -229,12 +233,14 @@ namespace Sim_Wheel_Config
                 2
             );
 
-            UpdateOrCreateButton(
+            UpdateOrCreateConnectButton(
                 "MainWindowDisplayDeviceNameButton",
                 "Connect",
                 new Thickness(852, 75, 0, 0),
                 100,
-                20
+                20,
+                MainWindowDisplayDeviceComPort,
+                MainWindowDisplayDeviceLEDCount
             );
 
             UpdateOrCreateLabel(
@@ -291,7 +297,7 @@ namespace Sim_Wheel_Config
                 currentContent = content;
             }
         }
-        private void UpdateOrCreateButton(string buttonName, string content, Thickness margin, double width, double height)
+        private void UpdateOrCreateConnectButton(string buttonName, string content, Thickness margin, double width, double height, string deviceComPort, string ledCount)
         {
 
             Button foundButton = (Button)MainGrid.FindName(buttonName);
@@ -313,6 +319,62 @@ namespace Sim_Wheel_Config
                 VerticalAlignment = VerticalAlignment.Top,
             };
 
+            newButton.Tag = new { deviceComPort, ledCount };
+            newButton.Click += ConnectButton_Click;
+            RegisterName(newButton.Name, newButton);
+            MainGrid.Children.Add(newButton);
+        }
+        private void UpdateOrCreateRainbowWaveButton(string buttonName, string content, Thickness margin, double width, double height, string command)
+        {
+
+            Button foundButton = (Button)MainGrid.FindName(buttonName);
+
+            if (foundButton != null)
+            {
+                MainGrid.Children.Remove(foundButton);
+                UnregisterName(buttonName);
+            }
+
+            Button newButton = new Button()
+            {
+                Name = buttonName,
+                Content = content,
+                Margin = margin,
+                Width = width,
+                Height = height,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+
+            newButton.Tag = new { command };
+            newButton.Click += RainbowWaveButton_Click;
+            RegisterName(newButton.Name, newButton);
+            MainGrid.Children.Add(newButton);
+        }
+        private void UpdateOrCreateSendColorButton(string buttonName, string content, Thickness margin, double width, double height, string command)
+        {
+
+            Button foundButton = (Button)MainGrid.FindName(buttonName);
+
+            if (foundButton != null)
+            {
+                MainGrid.Children.Remove(foundButton);
+                UnregisterName(buttonName);
+            }
+
+            Button newButton = new Button()
+            {
+                Name = buttonName,
+                Content = content,
+                Margin = margin,
+                Width = width,
+                Height = height,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+
+            newButton.Tag = new { command };
+            newButton.Click += SendColorButton_Click;
             RegisterName(newButton.Name, newButton);
             MainGrid.Children.Add(newButton);
         }
@@ -343,14 +405,141 @@ namespace Sim_Wheel_Config
             MainGrid.Children.Add(newBorder);
         }
 
+        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = (Button)sender;
+
+            var buttonData = (dynamic)clickedButton.Tag;
+            string deviceComPort = buttonData.deviceComPort;
+            string ledCount = buttonData.ledCount;
+            // Open the selected COM port
+            try
+            {
+                _serialPort = new SerialPort(deviceComPort, 115200); // Set the port and baud rate
+                _serialPort.Open(); // Open the COM port
+                MessageBox.Show($"Connected to Com Port: {deviceComPort}\nLED Count: {ledCount}");
+                AddColorPicker();
+                UpdateOrCreateRainbowWaveButton(
+                "MainWindowDisplayRainbowWaveButton",
+                "Rainbow Wave",
+                new Thickness(700, 140, 0, 0),
+                200,
+                20,
+                "RainbowWave"
+                );
+                UpdateOrCreateSendColorButton(
+                "MainWindowDisplaySendColorButton",
+                "Send Color",
+                new Thickness(500, 140, 0, 0),
+                200,
+                20,
+                "SendColor"
+                );
+            }
+            catch (Exception ex)
+            {
+                Xceed.Wpf.Toolkit.MessageBox.Show($"Error opening COM port: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            
+        }
+        private void RainbowWaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = (Button)sender;
+
+            var buttonData = (dynamic)clickedButton.Tag;
+            string command = buttonData.command;
+            // Open the selected COM port
+            try
+            {
+                if (_serialPort != null && _serialPort.IsOpen)
+                {
+                    _serialPort.WriteLine("rainbow_wave"); // Send the command to Arduino to start rainbow wave
+                }
+                else
+                {
+                    Xceed.Wpf.Toolkit.MessageBox.Show("COM port is not open.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Xceed.Wpf.Toolkit.MessageBox.Show($"Error opening COM port: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+        }
+        private void SendColorButton_Click(object sender, RoutedEventArgs e)
+        {
+            
+            if (colorPicker != null)
+            {
+                
+                if (colorPicker.SelectedColor.HasValue)
+                {
+                    var selectedColor = colorPicker.SelectedColor.Value;
+                    byte red = selectedColor.R;
+                    byte green = selectedColor.G;
+                    byte blue = selectedColor.B;
+
+                    string colorString = $"red: {red}, green: {green}, blue: {blue},";
+
+                    if (_serialPort != null && _serialPort.IsOpen)
+                    {
+                        _serialPort.WriteLine(colorString);
+                    }
+                    else
+                    {
+                        Xceed.Wpf.Toolkit.MessageBox.Show("COM port is not open.");
+                    }
+                }
+                else
+                {
+                    
+                    MessageBox.Show("Please select a color before sending.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                
+                MessageBox.Show("Color Picker is not initialized. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void AddNewDevice_Click(object sender, RoutedEventArgs e)
         {
             NewDevice NewDeviceWindow = new NewDevice();
             NewDeviceWindow.Show();
         }
+        private void AddColorPicker()
+        {
+            // Create and initialize the ColorPicker
+            colorPicker = new ColorPicker()
+            {
+                Name = "colorPicker",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(290, 140, 0, 0),
+                Width = 200,
+                Height = 40,
+                Background = new SolidColorBrush(Color.FromArgb(255, 9, 9, 16)), // #FF090910
+                HeaderBackground = new SolidColorBrush(Color.FromArgb(255, 9, 9, 16)), // #FF090910
+                TabBackground = new SolidColorBrush(Color.FromArgb(255, 9, 9, 16)), // #FF090910
+                Foreground = Brushes.White,
+                HeaderForeground = Brushes.White,
+                TabForeground = Brushes.White,
+                DropDownBackground = new SolidColorBrush(Color.FromArgb(255, 9, 9, 16)), // #FF090910
+            };
 
+            // Add the ColorPicker to the MainGrid
+            MainGrid.Children.Add(colorPicker);
+        }
 
-
+        protected override void OnClosed(EventArgs e)
+        {
+            if (_serialPort != null && _serialPort.IsOpen)
+            {
+                _serialPort.Close();
+            }
+            base.OnClosed(e);
+        }
 
     }
 }

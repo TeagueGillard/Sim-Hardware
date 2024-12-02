@@ -26,7 +26,7 @@
 
         <!-- Connected Device Counter -->
         <Label x:Name="DevicesLabel" Content="No Devices Connected" HorizontalAlignment="Left" Margin="33,22,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
-        <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="40,50,0,0" Width="170" Height="1"/>
+        <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="33,50,0,0" Width="180" Height="1"/>
 
         <!-- Add new Device Button -->
         <Button x:Name="AddNewDeviceButton" Content="Add New Device" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="25,0,0,30" Height="30" Width="200" Click="AddNewDevice_Click"/>
