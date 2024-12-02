@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -23,7 +24,6 @@ namespace Sim_Wheel_Config
     {
 
         private DispatcherTimer _timer;
-        private FileSystemWatcher _fileWatcher;
         private int totalDevices = 0;
         private int deviceNumber = 0;
         private string MainWindowDisplayDeviceType = "0";
@@ -229,6 +229,14 @@ namespace Sim_Wheel_Config
                 2
             );
 
+            UpdateOrCreateButton(
+                "MainWindowDisplayDeviceNameBorder",
+                "Connect",
+                new Thickness(287, 105, 0, 0),
+                500,
+                75
+            );
+
             UpdateOrCreateLabel(
                 "MainWindowDisplayDeviceTypeLabel",
                 $"{MainWindowDisplayDeviceType} - ",
@@ -282,6 +290,31 @@ namespace Sim_Wheel_Config
                 MainGrid.Children.Add(newLabel);
                 currentContent = content;
             }
+        }
+        private void UpdateOrCreateButton(string buttonName, string content, Thickness margin, double width, double height)
+        {
+
+            Button foundButton = (Button)MainGrid.FindName(buttonName);
+
+            if (foundButton != null)
+            {
+                MainGrid.Children.Remove(foundButton);
+                UnregisterName(buttonName);
+            }
+
+            Button newButton = new Button()
+            {
+                Name = buttonName,
+                Content = content,
+                Margin = margin,
+                Width = width,
+                Height = height,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+
+            RegisterName(newButton.Name, newButton);
+            MainGrid.Children.Add(newButton);
         }
         private void UpdateOrCreateBorder(string borderName, Thickness margin, double width, double height, Brush borderBrush, double borderThickness)
         {
