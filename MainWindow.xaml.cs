@@ -223,18 +223,18 @@ namespace Sim_Wheel_Config
             UpdateOrCreateBorder(
                 "MainWindowDisplayDeviceNameBorder",
                 new Thickness(287, 105, 0, 0),
-                500,
+                665,
                 1,
                 new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
                 2
             );
 
             UpdateOrCreateButton(
-                "MainWindowDisplayDeviceNameBorder",
+                "MainWindowDisplayDeviceNameButton",
                 "Connect",
-                new Thickness(287, 105, 0, 0),
-                500,
-                75
+                new Thickness(852, 75, 0, 0),
+                100,
+                20
             );
 
             UpdateOrCreateLabel(
