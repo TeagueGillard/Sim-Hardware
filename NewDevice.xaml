@@ -9,10 +9,6 @@
     xmlns:local="clr-namespace:Sim_Wheel_Config"
     mc:Ignorable="d"
     Title="Sim Hardware | ALPHA  -  Add New Device"
-    MinWidth="600"
-    MinHeight="400"
-    MaxWidth="600"
-    MaxHeight="400" 
     ResizeMode="NoResize">
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">

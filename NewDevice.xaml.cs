@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using Xceed.Wpf.Toolkit;
 using System.IO.Ports;
 using System.IO;
+using System.Xml.Linq;
 
 namespace Sim_Wheel_Config
 {
@@ -71,17 +72,36 @@ namespace Sim_Wheel_Config
             {
                 string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
+
                 if (!Directory.Exists(folderPath))
                 {
                     Directory.CreateDirectory(folderPath);
                 }
-                string filePath = System.IO.Path.Combine(folderPath, "devices.txt");
-                int nextDeviceNumber = GetNextDeviceNumber(filePath);
-                File.AppendAllText(filePath, Environment.NewLine + "<device" + nextDeviceNumber + ">" + Environment.NewLine);
-                File.AppendAllText(filePath, "devicetype= RGBStrip" + Environment.NewLine);
-                File.AppendAllText(filePath, "devicename= " + RGBDeviceNameTextBox.Text + Environment.NewLine);
-                File.AppendAllText(filePath, "ledcount= " + number + Environment.NewLine);
-                File.AppendAllText(filePath, "devicecomport= " + _serialPort.PortName + Environment.NewLine);
+
+                string filePath = System.IO.Path.Combine(folderPath, "devices.xml");
+
+                XDocument doc;
+                if (File.Exists(filePath))
+                {
+                    doc = XDocument.Load(filePath);
+                }
+                else
+                {
+                    doc = new XDocument(new XElement("Devices"));
+                }
+
+                int nextDeviceNumber = GetNextDeviceNumber(doc);
+
+                XElement newDevice = new XElement("Device",
+                    new XAttribute("id", nextDeviceNumber),
+                    new XElement("DeviceType", "RGBStrip"),
+                    new XElement("DeviceName", RGBDeviceNameTextBox.Text),
+                    new XElement("LEDCount", number),
+                    new XElement("DeviceComPort", _serialPort.PortName)
+                );
+                doc.Root.Add(newDevice);
+                doc.Save(filePath);
+
                 System.Windows.MessageBox.Show($"RGB Strip {RGBDeviceNameTextBox.Text} Added Successfully!");
             }
             else
@@ -90,30 +110,18 @@ namespace Sim_Wheel_Config
             }
         }
 
-        private int GetNextDeviceNumber(string filePath)
+        private int GetNextDeviceNumber(XDocument doc)
         {
             int maxdevicenumber = 0;
-            if (File.Exists(filePath))
+
+            foreach (XElement device in doc.Descendants("Device"))
             {
-                string[] lines = File.ReadAllLines(filePath);
-                foreach (string line in lines)
+                if (device.Attribute("id") != null && int.TryParse(device.Attribute("id").Value, out int deviceId))
                 {
-                    if (line.StartsWith("<device"))
-                    {
-                        string devicepart = line.Substring(7, line.IndexOf(">") - 7);
-                        if (int.TryParse(devicepart, out int devicenumber))
-                        {
-                            if (devicenumber > maxdevicenumber)
-                            {
-                                maxdevicenumber = devicenumber;
-                            }
-                        }
-                    }
+                    maxdevicenumber = Math.Max(maxdevicenumber, deviceId);
                 }
             }
             return maxdevicenumber + 1;
-
-
         }
     }
 }

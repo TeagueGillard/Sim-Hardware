@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml;
+using System.Xml.Linq;
 using Path = System.IO.Path;
 
 namespace Sim_Wheel_Config
@@ -20,24 +21,44 @@ namespace Sim_Wheel_Config
 
     public partial class MainWindow : Window
     {
-        // Disable the Maximise button because it looks bad full screen
-        [DllImport("user32.dll")]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-        [DllImport("user32.dll")]
-        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-        private IntPtr _windowHandle;
-        private const int GWL_STYLE = -16;
-        private const int WS_MAXIMIZEBOX = 0x10000;
-        private void MainWindow_SourceInitialized(object sender, EventArgs e)
-        {
-            _windowHandle = new WindowInteropHelper(this).Handle;
-            SetWindowLong(_windowHandle, GWL_STYLE, GetWindowLong(_windowHandle, GWL_STYLE) & ~WS_MAXIMIZEBOX);
-        }
 
         private DispatcherTimer _timer;
         private FileSystemWatcher _fileWatcher;
         private int totalDevices = 0;
         private int deviceNumber = 0;
+        private string MainWindowDisplayDeviceType = "0";
+        private string MainWindowDisplayCurrentDeviceType = "No Device";
+        private string MainWindowDisplayDeviceName = "0";
+        private string MainWindowDisplayCurrentDeviceName = "No Device";
+        private string MainWindowDisplayDeviceLEDCount = "0";
+        private string MainWindowDisplayCurrentDeviceLEDCount = "No Device";
+        private string MainWindowDisplayDeviceComPort = "0";
+        private string MainWindowDisplayCurrentDeviceComPort = "No Device";
+        private FileSystemWatcher fileWatcher;
+
+        private void InitializeFileWatcher()
+        {
+            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
+            string filePath = System.IO.Path.Combine(folderPath, "devices.xml");
+
+            fileWatcher = new FileSystemWatcher(folderPath, "devices.xml")
+            {
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
+                EnableRaisingEvents = true
+            };
+
+            fileWatcher.Changed += (sender, e) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (e.FullPath == filePath)
+                    {
+                        UpdateDevices();
+                    }
+                });
+            };
+        }
 
         public MainWindow()
         {
@@ -51,31 +72,8 @@ namespace Sim_Wheel_Config
             UpdateDevicesConnected();
             UpdateDevices();
             VersionNoLabel.Content = "V0.0.1a";
-            this.SourceInitialized += MainWindow_SourceInitialized;
         }
 
-        private void InitializeFileWatcher()
-        {
-            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string folderPath = Path.Combine(documentsPath, "Sim Hardware");
-            string filePath = Path.Combine(folderPath, "devices.txt");
-
-            // Create a new FileSystemWatcher
-            _fileWatcher = new FileSystemWatcher
-            {
-                Path = folderPath,
-                Filter = "devices.txt",
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.Size
-            };
-
-            // Subscribe to the Changed event to reload devices when the file is modified
-            _fileWatcher.Changed += (sender, e) => UpdateDevices();
-            _fileWatcher.Created += (sender, e) => UpdateDevices();
-            _fileWatcher.Deleted += (sender, e) => UpdateDevices();
-
-            // Start watching
-            _fileWatcher.EnableRaisingEvents = true;
-        }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -86,21 +84,15 @@ namespace Sim_Wheel_Config
         {
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
-            string filePath = System.IO.Path.Combine(folderPath, "devices.txt");
+            string filePath = System.IO.Path.Combine(folderPath, "devices.xml");
 
             int totalDevices = 0;
 
             if (System.IO.File.Exists(filePath))
             {
-                string[] lines = System.IO.File.ReadAllLines(filePath);
-                foreach (var line in lines)
-                {
-                    if (line.StartsWith("<device"))
-                    {
-                        totalDevices++;
-                    }
+                XDocument doc = XDocument.Load(filePath);
 
-                }
+                totalDevices = doc.Descendants("Device").Count();
             }
 
             DevicesLabel.Content = $"Connected Devices: {totalDevices}";
@@ -109,58 +101,215 @@ namespace Sim_Wheel_Config
 
         private void UpdateDevices()
         {
-
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
-            string filePath = System.IO.Path.Combine(folderPath, "devices.txt");
+            string filePath = System.IO.Path.Combine(folderPath, "devices.xml");
+
+            // Clear existing children that match specific criteria (labels/buttons added by UpdateDevices)
+            List<UIElement> elementsToRemove = MainGrid.Children
+                .OfType<UIElement>()
+                .Where(child =>
+                    (child is Label label && label.Tag?.ToString() == "DeviceLabel") ||
+                    (child is Button button && button.Tag != null))
+                .ToList();
+
+            foreach (UIElement element in elementsToRemove)
+            {
+                MainGrid.Children.Remove(element);
+            }
 
             if (System.IO.File.Exists(filePath))
             {
-                string[] lines = System.IO.File.ReadAllLines(filePath);
+                XDocument doc = XDocument.Load(filePath);
                 int verticalPosition = 80;
 
-                for (int i = 0; i < lines.Length; i++)
+                foreach (XElement device in doc.Descendants("Device"))
                 {
-                    string line = lines[i];
+                    string deviceType = device.Element("DeviceType")?.Value;
+                    string deviceName = device.Element("DeviceName")?.Value;
+                    string ledCount = device.Element("LEDCount")?.Value;
+                    string deviceComPort = device.Element("DeviceComPort")?.Value;
 
-                    if (line.StartsWith("<device"))
+                    if (deviceType == "RGBStrip")
                     {
-                        totalDevices++;
-                    }
-
-                    if (totalDevices > deviceNumber)
-                    {
-                        if (line.StartsWith("<device"))
+                        MainGrid.Children.Add(new Label()
                         {
-                            if (i + 1 < lines.Length)
-                            {
-                                string deviceType = lines[i + 1];
-                                deviceType = deviceType.Substring(12);
+                            Tag = "DeviceLabel", // Tag to identify dynamically added labels
+                            Content = deviceName,
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(40, verticalPosition, 0, 0),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
 
-                                if (deviceType == "RGBStrip")
-                                {
-                                    string deviceName = lines[i + 2].Substring(12);
-                                    string ledcount = lines[i + 3].Substring(10);
-                                    string devicecomport = lines[i + 4].Substring(15);
+                        MainGrid.Children.Add(new Label()
+                        {
+                            Tag = "DeviceLabel",
+                            Content = "RGB Strip Device",
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(50, verticalPosition, 0, 120),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
 
-                                    MainGrid.Children.Add(new Label() { Content = "RGB Strip Device", HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(50, verticalPosition, 0, 120), FontSize = 16, Foreground = new SolidColorBrush(Color.FromArgb(255,255,255,255)),});
-                                    verticalPosition += 20;
-                                    MainGrid.Children.Add(new Label() { Content = deviceName , HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(100, verticalPosition, 0, 80), FontSize = 16, Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)), });
-                                    verticalPosition += 20;
-                                    MainGrid.Children.Add(new Label() { Content = ledcount , HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(100, verticalPosition, 0, 40), FontSize = 16, Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)), });
-                                    verticalPosition += 20;
-                                    MainGrid.Children.Add(new Label() { Content = devicecomport , HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(100, verticalPosition, 0, 0), FontSize = 16, Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)), });
-                                    verticalPosition += 20;
-                                }
-                                deviceNumber++;
-                                
-                            }
-                        }
+                        MainGrid.Children.Add(new Label()
+                        {
+                            Tag = "DeviceLabel",
+                            Content = $"{ledCount} Leds",
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(50, verticalPosition, 0, 40),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
+
+                        MainGrid.Children.Add(new Label()
+                        {
+                            Tag = "DeviceLabel",
+                            Content = deviceComPort,
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(50, verticalPosition, 0, 0),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
+
+                        Button button = new Button()
+                        {
+                            Content = "",
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(30, verticalPosition - 80, 0, 0),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                            Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                            Width = 200,
+                            Height = 95,
+                            Tag = deviceName,
+                        };
+                        button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
+                        button.Click += (sender, e) =>
+                        {
+                            MainWindowDisplayDeviceType = deviceType;
+                            MainWindowDisplayDeviceName = deviceName;
+                            MainWindowDisplayDeviceLEDCount = ledCount;
+                            MainWindowDisplayDeviceComPort = deviceComPort;
+                            MainWindowDisplay();
+                        };
+                        MainGrid.Children.Add(button);
+
+                        verticalPosition += 20;
                     }
                 }
             }
         }
-        // Loads the new device window when the "Add New Device" button is pressed
+
+        private void MainWindowDisplay()
+        {
+            UpdateOrCreateLabel(
+                "MainWindowDisplayDeviceNameLabel",
+                MainWindowDisplayDeviceName,
+                ref MainWindowDisplayCurrentDeviceName,
+                new Thickness(280, 55, 0, 0),
+                32
+            );
+
+            UpdateOrCreateBorder(
+                "MainWindowDisplayDeviceNameBorder",
+                new Thickness(287, 105, 0, 0),
+                500,
+                1,
+                new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                2
+            );
+
+            UpdateOrCreateLabel(
+                "MainWindowDisplayDeviceTypeLabel",
+                $"{MainWindowDisplayDeviceType} - ",
+                ref MainWindowDisplayCurrentDeviceType,
+                new Thickness(283, 100, 0, 0),
+                16
+            );
+
+            UpdateOrCreateLabel(
+                "MainWindowDisplayDeviceLEDCountLabel",
+                $"{MainWindowDisplayDeviceLEDCount} Leds -",
+                ref MainWindowDisplayCurrentDeviceLEDCount,
+                new Thickness(363, 100, 0, 0),
+                16
+            );
+
+            UpdateOrCreateLabel(
+                "MainWindowDisplayDeviceComPortLabel",
+                MainWindowDisplayDeviceComPort,
+                ref MainWindowDisplayCurrentDeviceComPort,
+                new Thickness(443, 100, 0, 0),
+                16
+            );
+        }
+
+        private void UpdateOrCreateLabel(string labelName, string content, ref string currentContent, Thickness margin, double fontSize)
+        {
+            if (content != currentContent)
+            {
+
+                Label foundLabel = (Label)MainGrid.FindName(labelName);
+
+                if (foundLabel != null)
+                {
+                    MainGrid.Children.Remove(foundLabel);
+                    UnregisterName(labelName);
+                }
+
+                Label newLabel = new Label()
+                {
+                    Name = labelName,
+                    Content = content,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Margin = margin,
+                    FontSize = fontSize,
+                    Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                };
+
+                RegisterName(newLabel.Name, newLabel);
+                MainGrid.Children.Add(newLabel);
+                currentContent = content;
+            }
+        }
+        private void UpdateOrCreateBorder(string borderName, Thickness margin, double width, double height, Brush borderBrush, double borderThickness)
+        {
+
+            Border foundBorder = (Border)MainGrid.FindName(borderName);
+
+            if (foundBorder != null)
+            {
+                MainGrid.Children.Remove(foundBorder);
+                UnregisterName(borderName);
+            }
+
+            Border newBorder = new Border()
+            {
+                Name = borderName,
+                Margin = margin,
+                Width = width,
+                Height = height,
+                BorderBrush = borderBrush,
+                BorderThickness = new Thickness(borderThickness),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+
+            RegisterName(newBorder.Name, newBorder);
+            MainGrid.Children.Add(newBorder);
+        }
+
         private void AddNewDevice_Click(object sender, RoutedEventArgs e)
         {
             NewDevice NewDeviceWindow = new NewDevice();

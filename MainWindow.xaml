@@ -9,11 +9,9 @@
         xmlns:local="clr-namespace:Sim_Wheel_Config"
         mc:Ignorable="d"
         Title="Sim Hardware | ALPHA"
-        MinWidth="1000"
-        MinHeight="600"
-        MaxWidth="2600"
-        MaxHeight="1500" >
-        <Window.Background>
+        ResizeMode="NoResize">
+        
+    <Window.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                 <GradientStop Color="#FF121220"/>
                 <GradientStop Color="#FF090910" Offset="1"/>
@@ -23,8 +21,8 @@
     <Grid x:Name="MainGrid">
 
         <!-- Version info Display -->
-        <Label x:Name="VersionNoLabel" Content="Version" HorizontalAlignment="Right" Margin="0,0,0,-4" VerticalAlignment="Bottom" Foreground="White" Grid.ColumnSpan="2"/>
-        <Label x:Name="VersionLabel" Content="Version:" HorizontalAlignment="Right" Margin="0,0,40,-4" VerticalAlignment="Bottom" Foreground="White"/>
+        <Label x:Name="VersionNoLabel" Content="Version" HorizontalAlignment="Right" Margin="0,0,5,-4" VerticalAlignment="Bottom" Foreground="White" Grid.ColumnSpan="2"/>
+        <Label x:Name="VersionLabel" Content="Version:" HorizontalAlignment="Right" Margin="0,0,50,-4" VerticalAlignment="Bottom" Foreground="White"/>
 
         <!-- Connected Device Counter -->
         <Label x:Name="DevicesLabel" Content="No Devices Connected" HorizontalAlignment="Left" Margin="33,22,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
@@ -39,5 +37,26 @@
         <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="55,0,0,66" Width="140" Height="1"/>
 
     </Grid>
+    <Window.Resources>
+        <ControlTemplate x:Key="NoMouseOverButtonTemplate"   
+                 TargetType="Button">
+            <Border Background="{TemplateBinding Background}"  
+          BorderBrush="{TemplateBinding BorderBrush}"  
+          BorderThickness="{TemplateBinding BorderThickness}">
+                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"  
+                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </Border>
+
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled"  
+             Value="False">
+                    <Setter Property="Background"  
+              Value="{x:Static SystemColors.ControlLightBrush}" />
+                    <Setter Property="Foreground"  
+              Value="{x:Static SystemColors.GrayTextBrush}" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+    </Window.Resources>
 
 </Window>
