@@ -10,14 +10,14 @@
         mc:Ignorable="d"
         Title="Sim Hardware | ALPHA"
         ResizeMode="NoResize"
-        Icon="Resources/1212313123123213213123123213123123131_KOS_icon.ico">
-        
+        Icon="Resources/icon.ico">
+
     <Window.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="#FF121220"/>
-                <GradientStop Color="#FF090910" Offset="1"/>
-            </LinearGradientBrush>
-        </Window.Background>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="#FF121220"/>
+            <GradientStop Color="#FF090910" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
 
     <Grid x:Name="MainGrid">
 
@@ -36,6 +36,7 @@
         <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="255,70,0,90" Width="2" Height="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Height}"/>
         <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-2000, 0, -2000, 16" Width="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Width}" Height="1"/>
         <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="55,0,0,66" Width="140" Height="1"/>
+        
 
     </Grid>
     <Window.Resources>

@@ -184,6 +184,17 @@ namespace Sim_Wheel_Config
                         });
                         verticalPosition += 20;
 
+                        Image image = new Image()
+                        {
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Height = 120,
+                            Width = 120,
+                            Margin = new Thickness(130, verticalPosition - 70, 0, 0),
+                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/RGB-STRIP.png"))
+                        };
+                        MainGrid.Children.Add(image);
+
                         Button button = new Button()
                         {
                             Content = "",
@@ -207,7 +218,7 @@ namespace Sim_Wheel_Config
                             MainWindowDisplay();
                         };
                         MainGrid.Children.Add(button);
-
+                        
                         verticalPosition += 20;
                     }
                 }
