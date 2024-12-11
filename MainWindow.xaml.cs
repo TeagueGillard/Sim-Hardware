@@ -32,6 +32,8 @@ namespace Sim_Wheel_Config
         private int deviceNumber = 0;
         private string MainWindowDisplayDeviceType = "0";
         private string MainWindowDisplayCurrentDeviceType = "No Device";
+        private string MainWindowDisplayDeviceID = "0";
+        private string MainWindowDisplayCurrentDeviceID = "No Device";
         private string MainWindowDisplayDeviceName = "0";
         private string MainWindowDisplayCurrentDeviceName = "No Device";
         private string MainWindowDisplayDeviceLEDCount = "0";
@@ -114,7 +116,8 @@ namespace Sim_Wheel_Config
                 .OfType<UIElement>()
                 .Where(child =>
                     (child is Label label && label.Tag?.ToString() == "DeviceLabel") ||
-                    (child is Button button && button.Tag != null))
+                    (child is Button button && button.Tag != null) ||
+                    (child is Image image))
                 .ToList();
 
             foreach (UIElement element in elementsToRemove)
@@ -130,6 +133,7 @@ namespace Sim_Wheel_Config
                 foreach (XElement device in doc.Descendants("Device"))
                 {
                     string deviceType = device.Element("DeviceType")?.Value;
+                    string deviceID = device.Attribute("id")?.Value;
                     string deviceName = device.Element("DeviceName")?.Value;
                     string ledCount = device.Element("LEDCount")?.Value;
                     string deviceComPort = device.Element("DeviceComPort")?.Value;
@@ -212,6 +216,7 @@ namespace Sim_Wheel_Config
                         button.Click += (sender, e) =>
                         {
                             MainWindowDisplayDeviceType = deviceType;
+                            MainWindowDisplayDeviceID = deviceID;
                             MainWindowDisplayDeviceName = deviceName;
                             MainWindowDisplayDeviceLEDCount = ledCount;
                             MainWindowDisplayDeviceComPort = deviceComPort;
@@ -227,6 +232,7 @@ namespace Sim_Wheel_Config
 
         private void MainWindowDisplay()
         {
+            
             UpdateOrCreateLabel(
                 "MainWindowDisplayDeviceNameLabel",
                 MainWindowDisplayDeviceName,
@@ -245,13 +251,23 @@ namespace Sim_Wheel_Config
             );
 
             UpdateOrCreateConnectButton(
-                "MainWindowDisplayDeviceNameButton",
+                "MainWindowDisplayDeviceConnectButton",
                 "Connect",
-                new Thickness(852, 75, 0, 0),
+                new Thickness(852, 111, 0, 0),
                 100,
                 20,
                 MainWindowDisplayDeviceComPort,
                 MainWindowDisplayDeviceLEDCount
+            );
+
+            UpdateOrCreateDeleteButton(
+                "MainWindowDisplayDeviceDeleteButton",
+                "Delete Device",
+                new Thickness(852, 511, 0, 0),
+                100,
+                20,
+                MainWindowDisplayDeviceID,
+                MainWindowDisplayDeviceName
             );
 
             UpdateOrCreateLabel(
@@ -332,6 +348,33 @@ namespace Sim_Wheel_Config
 
             newButton.Tag = new { deviceComPort, ledCount };
             newButton.Click += ConnectButton_Click;
+            RegisterName(newButton.Name, newButton);
+            MainGrid.Children.Add(newButton);
+        }
+        private void UpdateOrCreateDeleteButton(string buttonName, string content, Thickness margin, double width, double height, string device, string deviceName)
+        {
+
+            Button foundButton = (Button)MainGrid.FindName(buttonName);
+
+            if (foundButton != null)
+            {
+                MainGrid.Children.Remove(foundButton);
+                UnregisterName(buttonName);
+            }
+
+            Button newButton = new Button()
+            {
+                Name = buttonName,
+                Content = content,
+                Margin = margin,
+                Width = width,
+                Height = height,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+
+            newButton.Tag = new { device, deviceName };
+            newButton.Click += DeleteButton_Click;
             RegisterName(newButton.Name, newButton);
             MainGrid.Children.Add(newButton);
         }
@@ -452,6 +495,67 @@ namespace Sim_Wheel_Config
                 Xceed.Wpf.Toolkit.MessageBox.Show($"Error opening COM port: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             
+        }
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = (Button)sender;
+
+            var buttonData = (dynamic)clickedButton.Tag;
+            string deviceID = buttonData.device;
+            string deviceName = buttonData.deviceName;
+            MessageBoxResult result = MessageBox.Show(
+                $"Are you sure you want to delete {deviceName}?",
+                "Confirm Delete",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning
+            );
+
+            if (result == MessageBoxResult.Yes)
+            {
+                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
+                string filePath = System.IO.Path.Combine(folderPath, "devices.xml");
+                try
+                {
+
+                    XDocument doc = XDocument.Load(filePath);
+                    XElement deviceToDelete = doc.Descendants("Device").FirstOrDefault(d => d.Attribute("id")?.Value == deviceID);
+
+                    if (deviceToDelete != null)
+                    {
+                        
+                        deviceToDelete.Remove();
+                        doc.Save(filePath);
+
+                        MessageBox.Show($"{deviceName} was deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MainWindowDisplayDeviceType = " ";
+                        MainWindowDisplayCurrentDeviceType = "Device Deleted!";
+                        MainWindowDisplayDeviceID = " ";
+                        MainWindowDisplayCurrentDeviceID = "Device Deleted!";
+                        MainWindowDisplayDeviceName = "Device was Deleted!";
+                        MainWindowDisplayCurrentDeviceName = "Device Deleted!";
+                        MainWindowDisplayDeviceLEDCount = " ";
+                        MainWindowDisplayCurrentDeviceLEDCount = "Device Deleted!";
+                        MainWindowDisplayDeviceComPort = " ";
+                        MainWindowDisplayCurrentDeviceComPort = "Device Deleted!";
+                        UpdateDevicesConnected();
+                        UpdateDevices();
+                        MainWindowDisplay();
+                    }
+                    else
+                    {
+                        MessageBox.Show($"An error occurred while deleting the device: {deviceName}", "Cancel", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An error occurred while deleting the device: {deviceName}", "Cancel", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show($"{deviceName} was not deleted.", "Cancel", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
         private void RainbowWaveButton_Click(object sender, RoutedEventArgs e)
         {
