@@ -20,9 +20,11 @@ using Path = System.IO.Path;
 using Xceed.Wpf.AvalonDock;
 using Xceed.Wpf.Toolkit;
 using MessageBox = System.Windows.MessageBox;
+using SharpDX.DirectInput;
 
 namespace Sim_Wheel_Config
 {
+    
 
     public partial class MainWindow : Window
     {
@@ -42,6 +44,9 @@ namespace Sim_Wheel_Config
         private string MainWindowDisplayCurrentDeviceComPort = "No Device";
         private FileSystemWatcher fileWatcher;
         private ColorPicker colorPicker;
+        private DirectInput directInput;
+        private Joystick joystick;
+        private JoystickState joystickState;
 
         private void InitializeFileWatcher()
         {
@@ -72,6 +77,7 @@ namespace Sim_Wheel_Config
 
             InitializeComponent();
             InitializeFileWatcher();
+            InitializeDirectInput();
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += Timer_Tick;
@@ -85,6 +91,7 @@ namespace Sim_Wheel_Config
         private void Timer_Tick(object sender, EventArgs e)
         {
             UpdateDevicesConnected();
+            PollGamepad();
         }
 
         private void UpdateDevicesConnected()
@@ -102,7 +109,7 @@ namespace Sim_Wheel_Config
                 totalDevices = doc.Descendants("Device").Count();
             }
 
-            DevicesLabel.Content = $"Connected Devices: {totalDevices}";
+            DevicesLabel.Content = $"Devices: {totalDevices}";
 
         }
 
@@ -138,6 +145,7 @@ namespace Sim_Wheel_Config
                     string ledCount = device.Element("LEDCount")?.Value;
                     string deviceComPort = device.Element("DeviceComPort")?.Value;
 
+                    // RGB Strip Page Setup
                     if (deviceType == "RGBStrip")
                     {
                         MainGrid.Children.Add(new Label()
@@ -224,6 +232,96 @@ namespace Sim_Wheel_Config
                         };
                         MainGrid.Children.Add(button);
                         
+                        verticalPosition += 20;
+                    }
+
+                    // Wheel Page Setup
+                    if (deviceType == "Wheel")
+                    {
+                        MainGrid.Children.Add(new Label()
+                        {
+                            Tag = "DeviceLabel",
+                            Content = deviceName,
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(40, verticalPosition, 0, 0),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
+
+                        MainGrid.Children.Add(new Label()
+                        {
+                            Tag = "DeviceLabel",
+                            Content = "Wheel",
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(50, verticalPosition, 0, 120),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
+
+                        MainGrid.Children.Add(new Label()
+                        {
+                            Tag = "DeviceLabel",
+                            Content = $"{ledCount} Leds",
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(50, verticalPosition, 0, 40),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
+
+                        MainGrid.Children.Add(new Label()
+                        {
+                            Tag = "DeviceLabel",
+                            Content = deviceComPort,
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(50, verticalPosition, 0, 0),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
+
+                        /*Image image = new Image()
+                        {
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Height = 120,
+                            Width = 120,
+                            Margin = new Thickness(130, verticalPosition - 70, 0, 0),
+                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/RGB-STRIP.png"))
+                        };
+                        MainGrid.Children.Add(image);*/
+
+                        Button button = new Button()
+                        {
+                            Content = "",
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(30, verticalPosition - 80, 0, 0),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                            Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                            Width = 200,
+                            Height = 95,
+                            Tag = deviceName,
+                        };
+                        button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
+                        button.Click += (sender, e) =>
+                        {
+                            MainWindowDisplayDeviceType = deviceType;
+                            MainWindowDisplayDeviceID = deviceID;
+                            MainWindowDisplayDeviceName = deviceName;
+                            MainWindowDisplayDeviceLEDCount = ledCount;
+                            MainWindowDisplayDeviceComPort = deviceComPort;
+                            MainWindowDisplay();
+                        };
+                        MainGrid.Children.Add(button);
+
                         verticalPosition += 20;
                     }
                 }
@@ -655,6 +753,64 @@ namespace Sim_Wheel_Config
             }
             base.OnClosed(e);
         }
+
+        private void InitializeDirectInput()
+        {
+            directInput = new DirectInput();
+
+            // Find the first connected joystick
+            var joysticks = directInput.GetDevices(DeviceType.Gamepad, DeviceEnumerationFlags.AllDevices);
+            if (joysticks.Any())
+            {
+                joystick = new Joystick(directInput, joysticks.First().InstanceGuid);
+                joystick.Acquire(); // Acquire the joystick to start receiving input
+            }
+            else
+            {
+                MessageBox.Show("No gamepad connected!");
+            }
+        }
+        // Method to poll the gamepad for input
+        private void PollGamepad()
+        {
+            if (joystick == null) return;
+
+            joystickState = joystick.GetCurrentState();
+
+            // Check if the 'A' button is pressed
+            if (joystickState.Buttons[0]) // Button index 0 is 'A' button
+            {
+                MessageBox.Show("A Button Pressed!");
+            }
+
+            // Check if the 'B' button is pressed
+            if (joystickState.Buttons[1]) // Button index 1 is 'B' button
+            {
+                MessageBox.Show("B Button Pressed!");
+            }
+
+            // Check if the 'X' button is pressed
+            if (joystickState.Buttons[2]) // Button index 2 is 'X' button
+            {
+                MessageBox.Show("X Button Pressed!");
+            }
+
+            // Check if the 'Y' button is pressed
+            if (joystickState.Buttons[3]) // Button index 3 is 'Y' button
+            {
+                MessageBox.Show("Y Button Pressed!");
+            }
+        }
+        // Don't forget to release the gamepad when the application exits
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (joystick != null)
+            {
+                joystick.Unacquire();
+                joystick.Dispose();
+            }
+        }
+
 
     }
 }
