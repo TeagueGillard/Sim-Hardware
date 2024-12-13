@@ -286,16 +286,16 @@ namespace Sim_Wheel_Config
                         });
                         verticalPosition += 20;
 
-                        /*Image image = new Image()
+                        Image image = new Image()
                         {
                             HorizontalAlignment = HorizontalAlignment.Left,
                             VerticalAlignment = VerticalAlignment.Top,
-                            Height = 120,
-                            Width = 120,
-                            Margin = new Thickness(130, verticalPosition - 70, 0, 0),
-                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/RGB-STRIP.png"))
+                            Height = 100,
+                            Width = 100,
+                            Margin = new Thickness(130, verticalPosition - 55, 0, 0),
+                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Alpine_Wheel.png"))
                         };
-                        MainGrid.Children.Add(image);*/
+                        MainGrid.Children.Add(image);
 
                         Button button = new Button()
                         {
