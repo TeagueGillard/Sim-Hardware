@@ -21,6 +21,7 @@ using Xceed.Wpf.AvalonDock;
 using Xceed.Wpf.Toolkit;
 using MessageBox = System.Windows.MessageBox;
 using SharpDX.DirectInput;
+using System.Runtime.CompilerServices;
 
 namespace Sim_Wheel_Config
 {
@@ -43,6 +44,8 @@ namespace Sim_Wheel_Config
         private string MainWindowDisplayCurrentDeviceLEDCount = "No Device";
         private string MainWindowDisplayDeviceComPort = "0";
         private string MainWindowDisplayCurrentDeviceComPort = "No Device";
+        private string MainWindowDisplayDeviceStatus = "Not Connected";
+        private string MainWindowDisplayCurrentDeviceStatus = "Not Connected";
         private FileSystemWatcher fileWatcher;
         private ColorPicker colorPicker;
         private DirectInput directInput;
@@ -58,6 +61,7 @@ namespace Sim_Wheel_Config
             MainWindowDisplayDeviceComPort = deviceComPort;
             InitializeComponent();
             DeviceDisplay();
+            this.Unloaded += Page_Unloaded;
         }
 
         private void DeviceDisplay()
@@ -123,6 +127,14 @@ namespace Sim_Wheel_Config
                 new Thickness(443, 100, 0, 0),
                 16
             );
+            UpdateOrCreateStatusLabel(
+                "MainWindowDisplayDeviceStatusLabel",
+                $"Status: {MainWindowDisplayDeviceStatus}",
+                ref MainWindowDisplayCurrentDeviceStatus,
+                new Thickness(0, 75, 27, 0),
+                16,
+                MainWindowDisplayDeviceStatus
+            );
         }
 
         private void UpdateOrCreateLabel(string labelName, string content, ref string currentContent, Thickness margin, double fontSize)
@@ -152,6 +164,50 @@ namespace Sim_Wheel_Config
                 RegisterName(newLabel.Name, newLabel);
                 DeviceDisplayGrid.Children.Add(newLabel);
                 currentContent = content;
+            }
+        }
+        private void UpdateOrCreateStatusLabel(string labelName, string content, ref string currentContent, Thickness margin, double fontSize, string deviceStatus)
+        {
+            if (content != currentContent)
+            {
+                Label foundLabel = (Label)DeviceDisplayGrid.FindName(labelName);
+                if (foundLabel != null)
+                {
+                    DeviceDisplayGrid.Children.Remove(foundLabel);
+                    UnregisterName(labelName);
+                }
+                if (deviceStatus == "Not Connected")
+                {
+                    Label newLabel = new Label()
+                    {
+                        Name = labelName,
+                        Content = content,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        Margin = margin,
+                        FontSize = fontSize,
+                        Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)),
+                    };
+                    RegisterName(newLabel.Name, newLabel);
+                    DeviceDisplayGrid.Children.Add(newLabel);
+                    currentContent = content;
+                }
+                if (deviceStatus == "Connected")
+                {
+                    Label newLabel = new Label()
+                    {
+                        Name = labelName,
+                        Content = content,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        Margin = margin,
+                        FontSize = fontSize,
+                        Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 255, 0)),
+                    };
+                    RegisterName(newLabel.Name, newLabel);
+                    DeviceDisplayGrid.Children.Add(newLabel);
+                    currentContent = content;
+                }
             }
         }
         private void UpdateOrCreateConnectButton(string buttonName, string content, Thickness margin, double width, double height, string deviceComPort, string ledCount)
@@ -301,8 +357,20 @@ namespace Sim_Wheel_Config
             {
                 _serialPort = new SerialPort(deviceComPort, 115200); // Set the port and baud rate
                 _serialPort.Open(); // Open the COM port
+                MainWindowDisplayDeviceStatus = "Connected";
+
+                UpdateOrCreateStatusLabel(
+                "MainWindowDisplayDeviceStatusLabel",
+                $"Status: {MainWindowDisplayDeviceStatus}",
+                ref MainWindowDisplayCurrentDeviceStatus,
+                new Thickness(0, 75, 27, 0),
+                16,
+                MainWindowDisplayDeviceStatus
+                );
+
                 MessageBox.Show($"Connected to Com Port: {deviceComPort}\nLED Count: {ledCount}");
                 AddColorPicker();
+
                 UpdateOrCreateRainbowWaveButton(
                 "MainWindowDisplayRainbowWaveButton",
                 "Rainbow Wave",
@@ -311,6 +379,7 @@ namespace Sim_Wheel_Config
                 20,
                 "RainbowWave"
                 );
+
                 UpdateOrCreateSendColorButton(
                 "MainWindowDisplaySendColorButton",
                 "Send Color",
@@ -520,6 +589,12 @@ namespace Sim_Wheel_Config
                 MessageBox.Show("Y Button Pressed!");
             }
         }
-
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (_serialPort != null && _serialPort.IsOpen)
+            {
+                _serialPort.Close();
+            }
+        }
     }
 }
