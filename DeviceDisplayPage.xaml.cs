@@ -24,9 +24,10 @@ using SharpDX.DirectInput;
 
 namespace Sim_Wheel_Config
 {
-    
-
-    public partial class MainWindow : Window
+    /// <summary>
+    /// Interaction logic for DeviceDisplayPage.xaml
+    /// </summary>
+    public partial class DeviceDisplayPage : Page
     {
         private SerialPort _serialPort;
         private DispatcherTimer _timer;
@@ -48,289 +49,20 @@ namespace Sim_Wheel_Config
         private Joystick joystick;
         private JoystickState joystickState;
 
-        private void InitializeFileWatcher()
+        public DeviceDisplayPage(string deviceType, string deviceID, string deviceName, string ledCount, string deviceComPort)
         {
-            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
-            string filePath = System.IO.Path.Combine(folderPath, "devices.xml");
-
-            fileWatcher = new FileSystemWatcher(folderPath, "devices.xml")
-            {
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
-                EnableRaisingEvents = true
-            };
-
-            fileWatcher.Changed += (sender, e) =>
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    if (e.FullPath == filePath)
-                    {
-                        UpdateDevices();
-                    }
-                });
-            };
-        }
-
-        public MainWindow()
-        {
-
+            MainWindowDisplayDeviceType = deviceType;
+            MainWindowDisplayDeviceID = deviceID;
+            MainWindowDisplayDeviceName = deviceName;
+            MainWindowDisplayDeviceLEDCount = ledCount;
+            MainWindowDisplayDeviceComPort = deviceComPort;
             InitializeComponent();
-            InitializeFileWatcher();
-            //InitializeDirectInput();
-            _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromSeconds(1);
-            _timer.Tick += Timer_Tick;
-            _timer.Start();
-            UpdateDevicesConnected();
-            UpdateDevices();
-            VersionNoLabel.Content = "V0.0.1a";
+            DeviceDisplay();
         }
 
-
-        private void Timer_Tick(object sender, EventArgs e)
+        private void DeviceDisplay()
         {
-            UpdateDevicesConnected();
-            //PollGamepad();
-        }
 
-        private void UpdateDevicesConnected()
-        {
-            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
-            string filePath = System.IO.Path.Combine(folderPath, "devices.xml");
-
-            int totalDevices = 0;
-
-            if (System.IO.File.Exists(filePath))
-            {
-                XDocument doc = XDocument.Load(filePath);
-
-                totalDevices = doc.Descendants("Device").Count();
-            }
-
-            DevicesLabel.Content = $"Devices: {totalDevices}";
-
-        }
-
-        private void UpdateDevices()
-        {
-            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
-            string filePath = System.IO.Path.Combine(folderPath, "devices.xml");
-
-            List<UIElement> elementsToRemove = MainGrid.Children
-                .OfType<UIElement>()
-                .Where(child =>
-                    (child is Label label && label.Tag?.ToString() == "DeviceLabel") ||
-                    (child is Button button && button.Tag != null) ||
-                    (child is Image image))
-                .ToList();
-
-            foreach (UIElement element in elementsToRemove)
-            {
-                MainGrid.Children.Remove(element);
-            }
-
-            if (System.IO.File.Exists(filePath))
-            {
-                XDocument doc = XDocument.Load(filePath);
-                int verticalPosition = 70;
-
-                foreach (XElement device in doc.Descendants("Device"))
-                {
-                    string deviceType = device.Element("DeviceType")?.Value;
-                    string deviceID = device.Attribute("id")?.Value;
-                    string deviceName = device.Element("DeviceName")?.Value;
-                    string ledCount = device.Element("LEDCount")?.Value;
-                    string deviceComPort = device.Element("DeviceComPort")?.Value;
-
-                    // RGB Strip Page Setup
-                    if (deviceType == "RGBStrip")
-                    {
-                        MainGrid.Children.Add(new Label()
-                        {
-                            Tag = "DeviceLabel",
-                            Content = deviceName,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(40, verticalPosition, 0, 0),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
-
-                        MainGrid.Children.Add(new Label()
-                        {
-                            Tag = "DeviceLabel",
-                            Content = "RGB Strip Device",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 120),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
-
-                        MainGrid.Children.Add(new Label()
-                        {
-                            Tag = "DeviceLabel",
-                            Content = $"{ledCount} Leds",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 40),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
-
-                        MainGrid.Children.Add(new Label()
-                        {
-                            Tag = "DeviceLabel",
-                            Content = deviceComPort,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 0),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
-
-                        Image image = new Image()
-                        {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Height = 120,
-                            Width = 120,
-                            Margin = new Thickness(130, verticalPosition - 70, 0, 0),
-                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/RGB-STRIP.png"))
-                        };
-                        MainGrid.Children.Add(image);
-
-                        Button button = new Button()
-                        {
-                            Content = "",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(30, verticalPosition - 80, 0, 0),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
-                            Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
-                            Width = 200,
-                            Height = 95,
-                            Tag = deviceName,
-                        };
-                        button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
-                        button.Click += (sender, e) =>
-                        {
-                            MainWindowDisplayDeviceType = deviceType;
-                            MainWindowDisplayDeviceID = deviceID;
-                            MainWindowDisplayDeviceName = deviceName;
-                            MainWindowDisplayDeviceLEDCount = ledCount;
-                            MainWindowDisplayDeviceComPort = deviceComPort;
-                            MainFrame.Navigate(new DeviceDisplayPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
-                        };
-                        MainGrid.Children.Add(button);
-                        
-                        verticalPosition += 20;
-                    }
-
-                    // Wheel Page Setup
-                    if (deviceType == "Wheel")
-                    {
-                        MainGrid.Children.Add(new Label()
-                        {
-                            Tag = "DeviceLabel",
-                            Content = deviceName,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(40, verticalPosition, 0, 0),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
-
-                        MainGrid.Children.Add(new Label()
-                        {
-                            Tag = "DeviceLabel",
-                            Content = "Wheel",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 120),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
-
-                        MainGrid.Children.Add(new Label()
-                        {
-                            Tag = "DeviceLabel",
-                            Content = $"{ledCount} Leds",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 40),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
-
-                        MainGrid.Children.Add(new Label()
-                        {
-                            Tag = "DeviceLabel",
-                            Content = deviceComPort,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 0),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
-
-                        Image image = new Image()
-                        {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Height = 100,
-                            Width = 100,
-                            Margin = new Thickness(130, verticalPosition - 55, 0, 0),
-                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Alpine_Wheel.png"))
-                        };
-                        MainGrid.Children.Add(image);
-
-                        Button button = new Button()
-                        {
-                            Content = "",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(30, verticalPosition - 80, 0, 0),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
-                            Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
-                            Width = 200,
-                            Height = 95,
-                            Tag = deviceName,
-                        };
-                        button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
-                        button.Click += (sender, e) =>
-                        {
-                            MainWindowDisplayDeviceType = deviceType;
-                            MainWindowDisplayDeviceID = deviceID;
-                            MainWindowDisplayDeviceName = deviceName;
-                            MainWindowDisplayDeviceLEDCount = ledCount;
-                            MainWindowDisplayDeviceComPort = deviceComPort;
-                            MainFrame.Navigate(new DeviceDisplayPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
-                        };
-                        MainGrid.Children.Add(button);
-
-                        verticalPosition += 20;
-                    }
-                }
-            }
-        }
-
-        private void MainWindowDisplay()
-        {
-            
             UpdateOrCreateLabel(
                 "MainWindowDisplayDeviceNameLabel",
                 MainWindowDisplayDeviceName,
@@ -398,11 +130,11 @@ namespace Sim_Wheel_Config
             if (content != currentContent)
             {
 
-                Label foundLabel = (Label)MainGrid.FindName(labelName);
+                Label foundLabel = (Label)DeviceDisplayGrid.FindName(labelName);
 
                 if (foundLabel != null)
                 {
-                    MainGrid.Children.Remove(foundLabel);
+                    DeviceDisplayGrid.Children.Remove(foundLabel);
                     UnregisterName(labelName);
                 }
 
@@ -418,18 +150,18 @@ namespace Sim_Wheel_Config
                 };
 
                 RegisterName(newLabel.Name, newLabel);
-                MainGrid.Children.Add(newLabel);
+                DeviceDisplayGrid.Children.Add(newLabel);
                 currentContent = content;
             }
         }
         private void UpdateOrCreateConnectButton(string buttonName, string content, Thickness margin, double width, double height, string deviceComPort, string ledCount)
         {
 
-            Button foundButton = (Button)MainGrid.FindName(buttonName);
+            Button foundButton = (Button)DeviceDisplayGrid.FindName(buttonName);
 
             if (foundButton != null)
             {
-                MainGrid.Children.Remove(foundButton);
+                DeviceDisplayGrid.Children.Remove(foundButton);
                 UnregisterName(buttonName);
             }
 
@@ -447,16 +179,16 @@ namespace Sim_Wheel_Config
             newButton.Tag = new { deviceComPort, ledCount };
             newButton.Click += ConnectButton_Click;
             RegisterName(newButton.Name, newButton);
-            MainGrid.Children.Add(newButton);
+            DeviceDisplayGrid.Children.Add(newButton);
         }
         private void UpdateOrCreateDeleteButton(string buttonName, string content, Thickness margin, double width, double height, string device, string deviceName)
         {
 
-            Button foundButton = (Button)MainGrid.FindName(buttonName);
+            Button foundButton = (Button)DeviceDisplayGrid.FindName(buttonName);
 
             if (foundButton != null)
             {
-                MainGrid.Children.Remove(foundButton);
+                DeviceDisplayGrid.Children.Remove(foundButton);
                 UnregisterName(buttonName);
             }
 
@@ -474,16 +206,16 @@ namespace Sim_Wheel_Config
             newButton.Tag = new { device, deviceName };
             newButton.Click += DeleteButton_Click;
             RegisterName(newButton.Name, newButton);
-            MainGrid.Children.Add(newButton);
+            DeviceDisplayGrid.Children.Add(newButton);
         }
         private void UpdateOrCreateRainbowWaveButton(string buttonName, string content, Thickness margin, double width, double height, string command)
         {
 
-            Button foundButton = (Button)MainGrid.FindName(buttonName);
+            Button foundButton = (Button)DeviceDisplayGrid.FindName(buttonName);
 
             if (foundButton != null)
             {
-                MainGrid.Children.Remove(foundButton);
+                DeviceDisplayGrid.Children.Remove(foundButton);
                 UnregisterName(buttonName);
             }
 
@@ -501,16 +233,16 @@ namespace Sim_Wheel_Config
             newButton.Tag = new { command };
             newButton.Click += RainbowWaveButton_Click;
             RegisterName(newButton.Name, newButton);
-            MainGrid.Children.Add(newButton);
+            DeviceDisplayGrid.Children.Add(newButton);
         }
         private void UpdateOrCreateSendColorButton(string buttonName, string content, Thickness margin, double width, double height, string command)
         {
 
-            Button foundButton = (Button)MainGrid.FindName(buttonName);
+            Button foundButton = (Button)DeviceDisplayGrid.FindName(buttonName);
 
             if (foundButton != null)
             {
-                MainGrid.Children.Remove(foundButton);
+                DeviceDisplayGrid.Children.Remove(foundButton);
                 UnregisterName(buttonName);
             }
 
@@ -528,16 +260,16 @@ namespace Sim_Wheel_Config
             newButton.Tag = new { command };
             newButton.Click += SendColorButton_Click;
             RegisterName(newButton.Name, newButton);
-            MainGrid.Children.Add(newButton);
+            DeviceDisplayGrid.Children.Add(newButton);
         }
         private void UpdateOrCreateBorder(string borderName, Thickness margin, double width, double height, Brush borderBrush, double borderThickness)
         {
 
-            Border foundBorder = (Border)MainGrid.FindName(borderName);
+            Border foundBorder = (Border)DeviceDisplayGrid.FindName(borderName);
 
             if (foundBorder != null)
             {
-                MainGrid.Children.Remove(foundBorder);
+                DeviceDisplayGrid.Children.Remove(foundBorder);
                 UnregisterName(borderName);
             }
 
@@ -554,7 +286,7 @@ namespace Sim_Wheel_Config
             };
 
             RegisterName(newBorder.Name, newBorder);
-            MainGrid.Children.Add(newBorder);
+            DeviceDisplayGrid.Children.Add(newBorder);
         }
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
@@ -592,7 +324,7 @@ namespace Sim_Wheel_Config
             {
                 Xceed.Wpf.Toolkit.MessageBox.Show($"Error opening COM port: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            
+
         }
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
@@ -621,7 +353,7 @@ namespace Sim_Wheel_Config
 
                     if (deviceToDelete != null)
                     {
-                        
+
                         deviceToDelete.Remove();
                         doc.Save(filePath);
 
@@ -636,9 +368,6 @@ namespace Sim_Wheel_Config
                         MainWindowDisplayCurrentDeviceLEDCount = "Device Deleted!";
                         MainWindowDisplayDeviceComPort = " ";
                         MainWindowDisplayCurrentDeviceComPort = "Device Deleted!";
-                        UpdateDevicesConnected();
-                        UpdateDevices();
-                        MainWindowDisplay();
                     }
                     else
                     {
@@ -681,10 +410,10 @@ namespace Sim_Wheel_Config
         }
         private void SendColorButton_Click(object sender, RoutedEventArgs e)
         {
-            
+
             if (colorPicker != null)
             {
-                
+
                 if (colorPicker.SelectedColor.HasValue)
                 {
                     var selectedColor = colorPicker.SelectedColor.Value;
@@ -705,13 +434,13 @@ namespace Sim_Wheel_Config
                 }
                 else
                 {
-                    
+
                     MessageBox.Show("Please select a color before sending.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             else
             {
-                
+
                 MessageBox.Show("Color Picker is not initialized. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -741,8 +470,8 @@ namespace Sim_Wheel_Config
                 DropDownBackground = new SolidColorBrush(Color.FromArgb(255, 9, 9, 16)), // #FF090910
             };
 
-            // Add the ColorPicker to the MainGrid
-            MainGrid.Children.Add(colorPicker);
+            // Add the ColorPicker to the DeviceDisplayGrid
+            DeviceDisplayGrid.Children.Add(colorPicker);
         }
 
         private void InitializeDirectInput()
@@ -792,21 +521,5 @@ namespace Sim_Wheel_Config
             }
         }
 
-
-
-
-        protected override void OnClosed(EventArgs e)
-        {
-            if (_serialPort != null && _serialPort.IsOpen)
-            {
-                _serialPort.Close();
-            }
-            if (joystick != null)
-            {
-                joystick.Unacquire();
-                joystick.Dispose();
-            }
-            base.OnClosed(e);
-        }
     }
 }

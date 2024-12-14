@@ -15,6 +15,8 @@ using Xceed.Wpf.Toolkit;
 using System.IO.Ports;
 using System.IO;
 using System.Xml.Linq;
+using SharpDX.DirectInput;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Sim_Wheel_Config
 {
@@ -22,12 +24,15 @@ namespace Sim_Wheel_Config
     {
 
         private SerialPort _serialPort;
-
+        private DirectInput directInput;
+        private Joystick joystick;
+        private JoystickState joystickState;
         public NewDevice()
         {
             InitializeComponent();
             RGBStripPopulateAndOpenComPort();
             WheelPopulateAndOpenComPort();
+            WheelPopulateAndSetInputDevice();
         }
 
 
@@ -75,7 +80,33 @@ namespace Sim_Wheel_Config
                 _serialPort = new SerialPort(selectedPort, 115200);
             }
         }
+        private void WheelPopulateAndSetInputDevice()
+        {
+            try
+            {
+                
+                directInput = new DirectInput();
+                var devices = directInput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AllDevices).ToList();
+                
+                if (devices.Any())
+                {
 
+                    WheelInputDeviceComboBox.ItemsSource = devices.Select(device => device.InstanceName).ToList();
+                    WheelInputDeviceComboBox.SelectedIndex = 0;
+
+                    var selectedInputDevice = devices.First();
+                    joystick = new Joystick(directInput, selectedInputDevice.InstanceGuid);
+                }
+                else
+                {
+                    MessageBox.Show("No gamepad connected!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error while populating devices: {ex.Message}");
+            }
+        }
 
         // Change selected Com port
         private void RGBStripcomPortComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -87,9 +118,16 @@ namespace Sim_Wheel_Config
         }
         private void WheelcomPortComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            if (RGBStripcomPortComboBox.SelectedItem != null)
+            if (WheelcomPortComboBox.SelectedItem != null)
             {
                 string selectedPort = WheelcomPortComboBox.SelectedItem.ToString();
+            }
+        }
+        private void WheelInputDeviceComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (WheelInputDeviceComboBox.SelectedItem != null)
+            {
+                string selectedInputDevice = WheelInputDeviceComboBox.SelectedItem.ToString();
             }
         }
 
@@ -141,6 +179,7 @@ namespace Sim_Wheel_Config
         private void AddWheelDeviceButton_Click(object sender, RoutedEventArgs e)
         {
             string number = WheelLEDCountTextBox.Text;
+            string WheelInputDevice = WheelInputDeviceComboBox.Text;
             if (int.TryParse(number, out _))
             {
                 string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -170,7 +209,8 @@ namespace Sim_Wheel_Config
                     new XElement("DeviceType", "Wheel"),
                     new XElement("DeviceName", WheelDeviceNameTextBox.Text),
                     new XElement("LEDCount", number),
-                    new XElement("DeviceComPort", _serialPort.PortName)
+                    new XElement("DeviceComPort", _serialPort.PortName),
+                    new XElement("InputDevice", WheelInputDevice)
                 );
                 doc.Root.Add(newDevice);
                 doc.Save(filePath);
