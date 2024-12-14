@@ -42,6 +42,8 @@ namespace Sim_Wheel_Config
         private string MainWindowDisplayCurrentDeviceLEDCount = "No Device";
         private string MainWindowDisplayDeviceComPort = "0";
         private string MainWindowDisplayCurrentDeviceComPort = "No Device";
+        private string MainWindowDisplayDeviceStatus = "Not Connected";
+        private string MainWindowDisplayCurrentDeviceStatus = "Not Connected";
         private FileSystemWatcher fileWatcher;
         private ColorPicker colorPicker;
         private DirectInput directInput;
@@ -223,11 +225,15 @@ namespace Sim_Wheel_Config
                         button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
                         button.Click += (sender, e) =>
                         {
+                            RemoveDeviceControls();
+                            DisconnectComPort();
+                            string deviceStatus = "Not Connected";
                             MainWindowDisplayDeviceType = deviceType;
                             MainWindowDisplayDeviceID = deviceID;
                             MainWindowDisplayDeviceName = deviceName;
                             MainWindowDisplayDeviceLEDCount = ledCount;
                             MainWindowDisplayDeviceComPort = deviceComPort;
+                            MainWindowDisplayDeviceStatus = deviceStatus;
                             MainWindowDisplay();
                         };
                         MainGrid.Children.Add(button);
@@ -313,11 +319,15 @@ namespace Sim_Wheel_Config
                         button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
                         button.Click += (sender, e) =>
                         {
+                            RemoveDeviceControls();
+                            DisconnectComPort();
+                            string deviceStatus = "Not Connected";
                             MainWindowDisplayDeviceType = deviceType;
                             MainWindowDisplayDeviceID = deviceID;
                             MainWindowDisplayDeviceName = deviceName;
                             MainWindowDisplayDeviceLEDCount = ledCount;
                             MainWindowDisplayDeviceComPort = deviceComPort;
+                            MainWindowDisplayDeviceStatus = deviceStatus;
                             MainWindowDisplay();
                         };
                         MainGrid.Children.Add(button);
@@ -330,7 +340,7 @@ namespace Sim_Wheel_Config
 
         private void MainWindowDisplay()
         {
-            
+
             UpdateOrCreateLabel(
                 "MainWindowDisplayDeviceNameLabel",
                 MainWindowDisplayDeviceName,
@@ -391,6 +401,15 @@ namespace Sim_Wheel_Config
                 new Thickness(443, 100, 0, 0),
                 16
             );
+
+            UpdateOrCreateStatusLabel(
+                "MainWindowDisplayDeviceStatusLabel",
+                $"Status: {MainWindowDisplayDeviceStatus}",
+                ref MainWindowDisplayCurrentDeviceStatus,
+                new Thickness(0, 75, 27, 0),
+                16,
+                MainWindowDisplayDeviceStatus
+            );
         }
 
         private void UpdateOrCreateLabel(string labelName, string content, ref string currentContent, Thickness margin, double fontSize)
@@ -420,6 +439,54 @@ namespace Sim_Wheel_Config
                 RegisterName(newLabel.Name, newLabel);
                 MainGrid.Children.Add(newLabel);
                 currentContent = content;
+            }
+        }
+        private void UpdateOrCreateStatusLabel(string labelName, string content, ref string currentContent, Thickness margin, double fontSize, string deviceStatus)
+        {
+            if (content != currentContent)
+            {
+
+                Label foundLabel = (Label)MainGrid.FindName(labelName);
+
+                if (foundLabel != null)
+                {
+                    MainGrid.Children.Remove(foundLabel);
+                    UnregisterName(labelName);
+                }
+                if (deviceStatus == "Not Connected")
+                {
+                    Label newLabel = new Label()
+                    {
+                        Name = labelName,
+                        Content = content,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        Margin = margin,
+                        FontSize = fontSize,
+                        Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)),
+                    };
+                    RegisterName(newLabel.Name, newLabel);
+                    MainGrid.Children.Add(newLabel);
+                    currentContent = content;
+                }
+                if (deviceStatus == "Connected")
+                {
+                    Label newLabel = new Label()
+                    {
+                        Name = labelName,
+                        Content = content,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        Margin = margin,
+                        FontSize = fontSize,
+                        Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 255, 0)),
+                    };
+                    RegisterName(newLabel.Name, newLabel);
+                    MainGrid.Children.Add(newLabel);
+                    currentContent = content;
+                }
+
+
             }
         }
         private void UpdateOrCreateConnectButton(string buttonName, string content, Thickness margin, double width, double height, string deviceComPort, string ledCount)
@@ -556,7 +623,7 @@ namespace Sim_Wheel_Config
             RegisterName(newBorder.Name, newBorder);
             MainGrid.Children.Add(newBorder);
         }
-
+        
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
             Button clickedButton = (Button)sender;
@@ -569,6 +636,15 @@ namespace Sim_Wheel_Config
             {
                 _serialPort = new SerialPort(deviceComPort, 115200); // Set the port and baud rate
                 _serialPort.Open(); // Open the COM port
+                MainWindowDisplayDeviceStatus = "Connected";
+                UpdateOrCreateStatusLabel(
+                "MainWindowDisplayDeviceStatusLabel",
+                $"Status: {MainWindowDisplayDeviceStatus}",
+                ref MainWindowDisplayCurrentDeviceStatus,
+                new Thickness(0, 75, 27, 0),
+                16,
+                MainWindowDisplayDeviceStatus
+                );
                 MessageBox.Show($"Connected to Com Port: {deviceComPort}\nLED Count: {ledCount}");
                 AddColorPicker();
                 UpdateOrCreateRainbowWaveButton(
@@ -745,13 +821,23 @@ namespace Sim_Wheel_Config
             MainGrid.Children.Add(colorPicker);
         }
 
-        protected override void OnClosed(EventArgs e)
+        private void RemoveDeviceControls()
         {
-            if (_serialPort != null && _serialPort.IsOpen)
+            MainGrid.Children.Remove(colorPicker);
+
+            Button foundRainBowButton = (Button)MainGrid.FindName("MainWindowDisplayRainbowWaveButton");
+            if (foundRainBowButton != null)
             {
-                _serialPort.Close();
+                MainGrid.Children.Remove(foundRainBowButton);
+                UnregisterName("MainWindowDisplayRainbowWaveButton");
             }
-            base.OnClosed(e);
+
+            Button foundSendColorButton = (Button)MainGrid.FindName("MainWindowDisplaySendColorButton");
+            if (foundSendColorButton != null)
+            {
+                MainGrid.Children.Remove(foundSendColorButton);
+                UnregisterName("MainWindowDisplaySendColorButton");
+            }
         }
 
         private void InitializeDirectInput()
@@ -801,16 +887,26 @@ namespace Sim_Wheel_Config
                 MessageBox.Show("Y Button Pressed!");
             }
         }
-        // Don't forget to release the gamepad when the application exits
-        private void Window_Closed(object sender, EventArgs e)
+        private void DisconnectComPort()
         {
+            if (_serialPort != null && _serialPort.IsOpen)
+            {
+                _serialPort.Close();
+            }
+        }
+        protected override void OnClosed(EventArgs e)
+        {
+            if (_serialPort != null && _serialPort.IsOpen)
+            {
+                _serialPort.Close();
+            }
             if (joystick != null)
             {
                 joystick.Unacquire();
                 joystick.Dispose();
             }
+            base.OnClosed(e);
         }
-
 
     }
 }
