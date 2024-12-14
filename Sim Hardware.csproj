@@ -16,7 +16,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Alpine_Wheel.png" />
     <None Remove="Resources\icon.ico" />
     <None Remove="Resources\RGB-STRIP.png" />
   </ItemGroup>
@@ -28,9 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Alpine_Wheel.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
     <Resource Include="Resources\icon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
