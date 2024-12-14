@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -79,7 +79,7 @@ namespace Sim_Wheel_Config
 
             InitializeComponent();
             InitializeFileWatcher();
-            //InitializeDirectInput();
+            InitializeDirectInput();
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += Timer_Tick;
@@ -359,6 +359,7 @@ namespace Sim_Wheel_Config
                 UnregisterName("MainWindowDisplaySendColorButton");
             }
         }
+
         private void DisconnectComPort()
         {
             if (_serialPort != null && _serialPort.IsOpen)
@@ -366,6 +367,8 @@ namespace Sim_Wheel_Config
                 _serialPort.Close();
             }
         }
+        
+        
         protected override void OnClosed(EventArgs e)
         {
             if (_serialPort != null && _serialPort.IsOpen)
@@ -379,5 +382,6 @@ namespace Sim_Wheel_Config
             }
             base.OnClosed(e);
         }
+        
     }
 }
