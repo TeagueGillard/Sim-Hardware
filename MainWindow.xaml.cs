@@ -77,7 +77,7 @@ namespace Sim_Wheel_Config
 
             InitializeComponent();
             InitializeFileWatcher();
-            //InitializeDirectInput();
+            InitializeDirectInput();
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += Timer_Tick;
@@ -91,7 +91,7 @@ namespace Sim_Wheel_Config
         private void Timer_Tick(object sender, EventArgs e)
         {
             UpdateDevicesConnected();
-            //PollGamepad();
+            PollGamepad();
         }
 
         private void UpdateDevicesConnected()
@@ -228,7 +228,7 @@ namespace Sim_Wheel_Config
                             MainWindowDisplayDeviceName = deviceName;
                             MainWindowDisplayDeviceLEDCount = ledCount;
                             MainWindowDisplayDeviceComPort = deviceComPort;
-                            MainFrame.Navigate(new DeviceDisplayPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
+                            MainWindowDisplay();
                         };
                         MainGrid.Children.Add(button);
                         
@@ -318,7 +318,7 @@ namespace Sim_Wheel_Config
                             MainWindowDisplayDeviceName = deviceName;
                             MainWindowDisplayDeviceLEDCount = ledCount;
                             MainWindowDisplayDeviceComPort = deviceComPort;
-                            MainFrame.Navigate(new DeviceDisplayPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
+                            MainWindowDisplay();
                         };
                         MainGrid.Children.Add(button);
 
@@ -745,6 +745,15 @@ namespace Sim_Wheel_Config
             MainGrid.Children.Add(colorPicker);
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            if (_serialPort != null && _serialPort.IsOpen)
+            {
+                _serialPort.Close();
+            }
+            base.OnClosed(e);
+        }
+
         private void InitializeDirectInput()
         {
             directInput = new DirectInput();
@@ -754,13 +763,14 @@ namespace Sim_Wheel_Config
             if (joysticks.Any())
             {
                 joystick = new Joystick(directInput, joysticks.First().InstanceGuid);
-                joystick.Acquire();
+                joystick.Acquire(); // Acquire the joystick to start receiving input
             }
             else
             {
                 MessageBox.Show("No gamepad connected!");
             }
         }
+        // Method to poll the gamepad for input
         private void PollGamepad()
         {
             if (joystick == null) return;
@@ -791,22 +801,16 @@ namespace Sim_Wheel_Config
                 MessageBox.Show("Y Button Pressed!");
             }
         }
-
-
-
-
-        protected override void OnClosed(EventArgs e)
+        // Don't forget to release the gamepad when the application exits
+        private void Window_Closed(object sender, EventArgs e)
         {
-            if (_serialPort != null && _serialPort.IsOpen)
-            {
-                _serialPort.Close();
-            }
             if (joystick != null)
             {
                 joystick.Unacquire();
                 joystick.Dispose();
             }
-            base.OnClosed(e);
         }
+
+
     }
 }
