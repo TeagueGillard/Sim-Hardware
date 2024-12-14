@@ -36,7 +36,7 @@
         <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="255,70,0,90" Width="2" Height="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Height}"/>
         <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-2000, 0, -2000, 16" Width="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Width}" Height="1"/>
         <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="55,0,0,66" Width="140" Height="1"/>
-        
+        <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
 
     </Grid>
     <Window.Resources>

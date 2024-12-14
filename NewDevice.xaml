@@ -11,14 +11,14 @@
     Title="Sim Hardware | ALPHA  -  Add New Device"
     ResizeMode="NoResize"
     Icon="Resources/icon.ico">
-    
+
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
             <GradientStop Color="#FF121220"/>
             <GradientStop Color="#FF090910" Offset="1"/>
         </LinearGradientBrush>
     </Window.Background>
-    
+
     <Window.Resources>
         <ControlTemplate x:Key="NoMouseOverButtonTemplate" TargetType="Button">
             <Border Background="{TemplateBinding Background}"  
@@ -36,30 +36,34 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
     </Window.Resources>
-    
+
     <Grid>
         <!-- RGB Strip -->
         <Button Content="RGB Strip" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,45,0,0" Height="69" Width="187" Background="#FF292929" Foreground="White" Template="{StaticResource NoMouseOverButtonTemplate}" />
-        <Label Content="Device Name:" Foreground="White"  HorizontalAlignment="Left" Margin="269,40,0,0" VerticalAlignment="Top"/>
+        <Label Content="Device Name:" Foreground="White"  HorizontalAlignment="Left" Margin="286,40,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="RGBStripDeviceNameTextBox"  HorizontalAlignment="Left" Margin="374,45,0,0" TextWrapping="NoWrap" Text="Device Name" VerticalAlignment="Top" Width="200" Background="#00000000" Foreground="White"/>
-        <Label Content="LED Count:" Foreground="White"  HorizontalAlignment="Left" Margin="269,64,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="RGBStripLEDCountTextBox"  HorizontalAlignment="Left" Margin="374,68,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White" PreviewTextInput="RGBLEDCountTextBox_PreviewTextInput"/>
-        <Label Content="Com Port:" Foreground="White"  HorizontalAlignment="Left" Margin="269,90,0,0" VerticalAlignment="Top"/>
-        <ComboBox Name="RGBStripcomPortComboBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="374,92,0,0" Width="200" Background="#FF090910" Foreground="Black" ></ComboBox>
+        <Label Content="VID:" Foreground="White"  HorizontalAlignment="Left" Margin="337,65,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="RGBStripVIDTextBox"  HorizontalAlignment="Left" Margin="374,69,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White"/>
+        <Label Content="PID:" Foreground="White"  HorizontalAlignment="Left" Margin="448,65,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="RGBStripPIDTextBox"  HorizontalAlignment="Left" Margin="484,69,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White"/>
+        <Label Content="LED Count:" Foreground="White"  HorizontalAlignment="Left" Margin="301,90,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="RGBStripLEDCountTextBox"  HorizontalAlignment="Left" Margin="374,94,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White" PreviewTextInput="RGBLEDCountTextBox_PreviewTextInput"/>
         <Button x:Name="RGBAddRGBStripDeviceButton"  Content="Add RGB Strip Device" HorizontalAlignment="Left" Margin="444,119,0,0" VerticalAlignment="Top" Width="130" Click="RGBAddRGBStripDeviceButton_Click"/>
-        
+
         <!-- Wheel -->
         <Button Content="Wheel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,155,0,0" Height="69" Width="187" Background="#FF292929" Foreground="White" Template="{StaticResource NoMouseOverButtonTemplate}"/>
-        <Label Content="Device Name:" Foreground="White"  HorizontalAlignment="Left" Margin="269,150,0,0" VerticalAlignment="Top"/>
+        <Label Content="Device Name:" Foreground="White"  HorizontalAlignment="Left" Margin="286,150,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="WheelDeviceNameTextBox"  HorizontalAlignment="Left" Margin="374,155,0,0" TextWrapping="NoWrap" Text="Device Name" VerticalAlignment="Top" Width="200" Background="#00000000" Foreground="White"/>
-        <Label Content="LED Count:" Foreground="White"  HorizontalAlignment="Left" Margin="269,174,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="WheelLEDCountTextBox"  HorizontalAlignment="Left" Margin="374,178,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White" PreviewTextInput="WheelLEDCountTextBox_PreviewTextInput"/>
-        <Label Content="Com Port:" Foreground="White"  HorizontalAlignment="Left" Margin="269,200,0,0" VerticalAlignment="Top"/>
-        <ComboBox Name="WheelcomPortComboBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="374,202,0,0" Width="200" Background="#FF090910" Foreground="Black" ></ComboBox>
+        <Label Content="VID:" Foreground="White"  HorizontalAlignment="Left" Margin="337,177,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="WheelVIDTextBox"  HorizontalAlignment="Left" Margin="374,181,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White"/>
+        <Label Content="PID:" Foreground="White"  HorizontalAlignment="Left" Margin="448,177,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="WheelPIDTextBox"  HorizontalAlignment="Left" Margin="484,181,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White"/>
+        <Label Content="LED Count:" Foreground="White"  HorizontalAlignment="Left" Margin="301,202,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="WheelLEDCountTextBox"  HorizontalAlignment="Left" Margin="374,206,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White" PreviewTextInput="WheelLEDCountTextBox_PreviewTextInput"/>
         <Button x:Name="AddWheelDeviceButton"  Content="Add Wheel Device" HorizontalAlignment="Left" Margin="444,229,0,0" VerticalAlignment="Top" Width="130" Click="AddWheelDeviceButton_Click"/>
-        
+
         <!-- Dash -->
         <Button Content="Dash" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,270,0,0" Height="69" Width="187" Background="#FF292929" Foreground="White" Template="{StaticResource NoMouseOverButtonTemplate}"/>
     </Grid>
-    
+
 </Window>
