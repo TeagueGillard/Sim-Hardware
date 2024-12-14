@@ -233,7 +233,7 @@ namespace Sim_Wheel_Config
                             MainWindowDisplayDeviceLEDCount = ledCount;
                             MainWindowDisplayDeviceComPort = deviceComPort;
                             MainWindowDisplayDeviceStatus = deviceStatus;
-                            MainFrame.Navigate(new DeviceDisplayPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
+                            MainFrame.Navigate(new RGBStripPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
                         };
                         MainGrid.Children.Add(button);
                         
@@ -327,7 +327,7 @@ namespace Sim_Wheel_Config
                             MainWindowDisplayDeviceLEDCount = ledCount;
                             MainWindowDisplayDeviceComPort = deviceComPort;
                             MainWindowDisplayDeviceStatus = deviceStatus;
-                            MainFrame.Navigate(new DeviceDisplayPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
+                            MainFrame.Navigate(new WheelPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
                         };
                         MainGrid.Children.Add(button);
 

@@ -28,7 +28,7 @@ namespace Sim_Wheel_Config
     /// <summary>
     /// Interaction logic for DeviceDisplayPage.xaml
     /// </summary>
-    public partial class DeviceDisplayPage : Page
+    public partial class WheelPage : Page
     {
         private SerialPort _serialPort;
         private DispatcherTimer _timer;
@@ -52,7 +52,7 @@ namespace Sim_Wheel_Config
         private Joystick joystick;
         private JoystickState joystickState;
 
-        public DeviceDisplayPage(string deviceType, string deviceID, string deviceName, string ledCount, string deviceComPort)
+        public WheelPage(string deviceType, string deviceID, string deviceName, string ledCount, string deviceComPort)
         {
             MainWindowDisplayDeviceType = deviceType;
             MainWindowDisplayDeviceID = deviceID;
@@ -142,11 +142,11 @@ namespace Sim_Wheel_Config
             if (content != currentContent)
             {
 
-                Label foundLabel = (Label)DeviceDisplayGrid.FindName(labelName);
+                Label foundLabel = (Label)WheelPageGrid.FindName(labelName);
 
                 if (foundLabel != null)
                 {
-                    DeviceDisplayGrid.Children.Remove(foundLabel);
+                    WheelPageGrid.Children.Remove(foundLabel);
                     UnregisterName(labelName);
                 }
 
@@ -162,7 +162,7 @@ namespace Sim_Wheel_Config
                 };
 
                 RegisterName(newLabel.Name, newLabel);
-                DeviceDisplayGrid.Children.Add(newLabel);
+                WheelPageGrid.Children.Add(newLabel);
                 currentContent = content;
             }
         }
@@ -170,10 +170,10 @@ namespace Sim_Wheel_Config
         {
             if (content != currentContent)
             {
-                Label foundLabel = (Label)DeviceDisplayGrid.FindName(labelName);
+                Label foundLabel = (Label)WheelPageGrid.FindName(labelName);
                 if (foundLabel != null)
                 {
-                    DeviceDisplayGrid.Children.Remove(foundLabel);
+                    WheelPageGrid.Children.Remove(foundLabel);
                     UnregisterName(labelName);
                 }
                 if (deviceStatus == "Not Connected")
@@ -189,7 +189,7 @@ namespace Sim_Wheel_Config
                         Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)),
                     };
                     RegisterName(newLabel.Name, newLabel);
-                    DeviceDisplayGrid.Children.Add(newLabel);
+                    WheelPageGrid.Children.Add(newLabel);
                     currentContent = content;
                 }
                 if (deviceStatus == "Connected")
@@ -205,7 +205,7 @@ namespace Sim_Wheel_Config
                         Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 255, 0)),
                     };
                     RegisterName(newLabel.Name, newLabel);
-                    DeviceDisplayGrid.Children.Add(newLabel);
+                    WheelPageGrid.Children.Add(newLabel);
                     currentContent = content;
                 }
             }
@@ -213,11 +213,11 @@ namespace Sim_Wheel_Config
         private void UpdateOrCreateConnectButton(string buttonName, string content, Thickness margin, double width, double height, string deviceComPort, string ledCount)
         {
 
-            Button foundButton = (Button)DeviceDisplayGrid.FindName(buttonName);
+            Button foundButton = (Button)WheelPageGrid.FindName(buttonName);
 
             if (foundButton != null)
             {
-                DeviceDisplayGrid.Children.Remove(foundButton);
+                WheelPageGrid.Children.Remove(foundButton);
                 UnregisterName(buttonName);
             }
 
@@ -235,16 +235,16 @@ namespace Sim_Wheel_Config
             newButton.Tag = new { deviceComPort, ledCount };
             newButton.Click += ConnectButton_Click;
             RegisterName(newButton.Name, newButton);
-            DeviceDisplayGrid.Children.Add(newButton);
+            WheelPageGrid.Children.Add(newButton);
         }
         private void UpdateOrCreateDeleteButton(string buttonName, string content, Thickness margin, double width, double height, string device, string deviceName)
         {
 
-            Button foundButton = (Button)DeviceDisplayGrid.FindName(buttonName);
+            Button foundButton = (Button)WheelPageGrid.FindName(buttonName);
 
             if (foundButton != null)
             {
-                DeviceDisplayGrid.Children.Remove(foundButton);
+                WheelPageGrid.Children.Remove(foundButton);
                 UnregisterName(buttonName);
             }
 
@@ -262,16 +262,16 @@ namespace Sim_Wheel_Config
             newButton.Tag = new { device, deviceName };
             newButton.Click += DeleteButton_Click;
             RegisterName(newButton.Name, newButton);
-            DeviceDisplayGrid.Children.Add(newButton);
+            WheelPageGrid.Children.Add(newButton);
         }
         private void UpdateOrCreateRainbowWaveButton(string buttonName, string content, Thickness margin, double width, double height, string command)
         {
 
-            Button foundButton = (Button)DeviceDisplayGrid.FindName(buttonName);
+            Button foundButton = (Button)WheelPageGrid.FindName(buttonName);
 
             if (foundButton != null)
             {
-                DeviceDisplayGrid.Children.Remove(foundButton);
+                WheelPageGrid.Children.Remove(foundButton);
                 UnregisterName(buttonName);
             }
 
@@ -289,16 +289,16 @@ namespace Sim_Wheel_Config
             newButton.Tag = new { command };
             newButton.Click += RainbowWaveButton_Click;
             RegisterName(newButton.Name, newButton);
-            DeviceDisplayGrid.Children.Add(newButton);
+            WheelPageGrid.Children.Add(newButton);
         }
         private void UpdateOrCreateSendColorButton(string buttonName, string content, Thickness margin, double width, double height, string command)
         {
 
-            Button foundButton = (Button)DeviceDisplayGrid.FindName(buttonName);
+            Button foundButton = (Button)WheelPageGrid.FindName(buttonName);
 
             if (foundButton != null)
             {
-                DeviceDisplayGrid.Children.Remove(foundButton);
+                WheelPageGrid.Children.Remove(foundButton);
                 UnregisterName(buttonName);
             }
 
@@ -316,16 +316,16 @@ namespace Sim_Wheel_Config
             newButton.Tag = new { command };
             newButton.Click += SendColorButton_Click;
             RegisterName(newButton.Name, newButton);
-            DeviceDisplayGrid.Children.Add(newButton);
+            WheelPageGrid.Children.Add(newButton);
         }
         private void UpdateOrCreateBorder(string borderName, Thickness margin, double width, double height, Brush borderBrush, double borderThickness)
         {
 
-            Border foundBorder = (Border)DeviceDisplayGrid.FindName(borderName);
+            Border foundBorder = (Border)WheelPageGrid.FindName(borderName);
 
             if (foundBorder != null)
             {
-                DeviceDisplayGrid.Children.Remove(foundBorder);
+                WheelPageGrid.Children.Remove(foundBorder);
                 UnregisterName(borderName);
             }
 
@@ -342,7 +342,7 @@ namespace Sim_Wheel_Config
             };
 
             RegisterName(newBorder.Name, newBorder);
-            DeviceDisplayGrid.Children.Add(newBorder);
+            WheelPageGrid.Children.Add(newBorder);
         }
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
@@ -539,8 +539,8 @@ namespace Sim_Wheel_Config
                 DropDownBackground = new SolidColorBrush(Color.FromArgb(255, 9, 9, 16)), // #FF090910
             };
 
-            // Add the ColorPicker to the DeviceDisplayGrid
-            DeviceDisplayGrid.Children.Add(colorPicker);
+            // Add the ColorPicker to the WheelPageGrid
+            WheelPageGrid.Children.Add(colorPicker);
         }
 
         private void InitializeDirectInput()
