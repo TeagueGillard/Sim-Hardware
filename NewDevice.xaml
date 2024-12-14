@@ -56,10 +56,10 @@
         <TextBox x:Name="WheelLEDCountTextBox"  HorizontalAlignment="Left" Margin="374,178,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White" PreviewTextInput="WheelLEDCountTextBox_PreviewTextInput"/>
         <Label Content="Com Port:" Foreground="White"  HorizontalAlignment="Left" Margin="269,200,0,0" VerticalAlignment="Top"/>
         <ComboBox Name="WheelcomPortComboBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="374,202,0,0" Width="200" Background="#FF090910" Foreground="Black" ></ComboBox>
-        <Button x:Name="AddWheelDeviceButton"  Content="Add Wheel Device" HorizontalAlignment="Left" Margin="444,229,0,0" VerticalAlignment="Top" Width="130" Click="AddWheelDeviceButton_Click"/>
+        <Label Content="Input Device:" Foreground="White"  HorizontalAlignment="Left" Margin="269,230,0,0" VerticalAlignment="Top"/>
+        <ComboBox Name="WheelInputDeviceComboBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="374,232,0,0" Width="200" Background="#FF090910" Foreground="Black" ></ComboBox>
+        <Button x:Name="AddWheelDeviceButton"  Content="Add Wheel Device" HorizontalAlignment="Left" Margin="444,259,0,0" VerticalAlignment="Top" Width="130" Click="AddWheelDeviceButton_Click"/>
         
-        <!-- Dash -->
-        <Button Content="Dash" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,270,0,0" Height="69" Width="187" Background="#FF292929" Foreground="White" Template="{StaticResource NoMouseOverButtonTemplate}"/>
     </Grid>
     
 </Window>
