@@ -1,26 +1,12 @@
 ﻿using System.IO;
 using System.IO.Ports;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using System.Xml;
 using System.Xml.Linq;
-using Path = System.IO.Path;
-using Xceed.Wpf.AvalonDock;
 using Xceed.Wpf.Toolkit;
 using MessageBox = System.Windows.MessageBox;
-using System.Runtime.CompilerServices;
 
 namespace Sim_Wheel_Config
 {
