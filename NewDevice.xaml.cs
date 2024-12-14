@@ -15,6 +15,7 @@ using Xceed.Wpf.Toolkit;
 using System.IO.Ports;
 using System.IO;
 using System.Xml.Linq;
+using Microsoft.Win32;
 
 namespace Sim_Wheel_Config
 {
@@ -26,8 +27,6 @@ namespace Sim_Wheel_Config
         public NewDevice()
         {
             InitializeComponent();
-            RGBStripPopulateAndOpenComPort();
-            WheelPopulateAndOpenComPort();
         }
 
 
@@ -49,54 +48,10 @@ namespace Sim_Wheel_Config
             return int.TryParse(text, out _);
         }
 
-
-        // Populate the COM port list and open selected port
-        private void RGBStripPopulateAndOpenComPort()
-        {
-            string[] comPorts = SerialPort.GetPortNames();
-
-            if (comPorts.Any())
-            {
-                string selectedPort = comPorts[0];
-                RGBStripcomPortComboBox.ItemsSource = comPorts;
-                RGBStripcomPortComboBox.SelectedIndex = 0;
-                _serialPort = new SerialPort(selectedPort, 115200);
-            }
-        }
-        private void WheelPopulateAndOpenComPort()
-        {
-            string[] comPorts = SerialPort.GetPortNames();
-
-            if (comPorts.Any())
-            {
-                string selectedPort = comPorts[0];
-                WheelcomPortComboBox.ItemsSource = comPorts;
-                WheelcomPortComboBox.SelectedIndex = 0;
-                _serialPort = new SerialPort(selectedPort, 115200);
-            }
-        }
-
-
-        // Change selected Com port
-        private void RGBStripcomPortComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            if (RGBStripcomPortComboBox.SelectedItem != null)
-            {
-                string selectedPort = RGBStripcomPortComboBox.SelectedItem.ToString();
-            }
-        }
-        private void WheelcomPortComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            if (RGBStripcomPortComboBox.SelectedItem != null)
-            {
-                string selectedPort = WheelcomPortComboBox.SelectedItem.ToString();
-            }
-        }
-
         private void RGBAddRGBStripDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            string number = RGBStripLEDCountTextBox.Text;
-            if (int.TryParse(number, out _))
+            string RGBStripLedCount = RGBStripLEDCountTextBox.Text;
+            if (int.TryParse(RGBStripLedCount, out _))
             {
                 string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
@@ -124,8 +79,9 @@ namespace Sim_Wheel_Config
                     new XAttribute("id", nextDeviceNumber),
                     new XElement("DeviceType", "RGBStrip"),
                     new XElement("DeviceName", RGBStripDeviceNameTextBox.Text),
-                    new XElement("LEDCount", number),
-                    new XElement("DeviceComPort", _serialPort.PortName)
+                    new XElement("LEDCount", RGBStripLedCount),
+                    new XElement("DeviceVID", RGBStripVIDTextBox.Text),
+                    new XElement("DevicePID", RGBStripPIDTextBox.Text)
                 );
                 doc.Root.Add(newDevice);
                 doc.Save(filePath);
@@ -134,14 +90,14 @@ namespace Sim_Wheel_Config
             }
             else
             {
-                System.Windows.MessageBox.Show("Error with LED count or Com Port!");
+                System.Windows.MessageBox.Show("Error with LED count, VID or PID!");
             }
         }
 
         private void AddWheelDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            string number = WheelLEDCountTextBox.Text;
-            if (int.TryParse(number, out _))
+            string WheelLedCount = WheelLEDCountTextBox.Text;
+            if (int.TryParse(WheelLedCount, out _))
             {
                 string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
@@ -169,8 +125,9 @@ namespace Sim_Wheel_Config
                     new XAttribute("id", nextDeviceNumber),
                     new XElement("DeviceType", "Wheel"),
                     new XElement("DeviceName", WheelDeviceNameTextBox.Text),
-                    new XElement("LEDCount", number),
-                    new XElement("DeviceComPort", _serialPort.PortName)
+                    new XElement("LEDCount", WheelLedCount),
+                    new XElement("DeviceVID", WheelVIDTextBox.Text),
+                    new XElement("DevicePID", WheelPIDTextBox.Text)
                 );
                 doc.Root.Add(newDevice);
                 doc.Save(filePath);
@@ -179,7 +136,7 @@ namespace Sim_Wheel_Config
             }
             else
             {
-                System.Windows.MessageBox.Show("Error with LED count or Com Port!");
+                System.Windows.MessageBox.Show("Error with LED count, VID or PID!");
             }
         }
 

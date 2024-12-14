@@ -21,6 +21,7 @@ using Xceed.Wpf.AvalonDock;
 using Xceed.Wpf.Toolkit;
 using MessageBox = System.Windows.MessageBox;
 using SharpDX.DirectInput;
+using Microsoft.Win32;
 
 namespace Sim_Wheel_Config
 {
@@ -79,7 +80,6 @@ namespace Sim_Wheel_Config
 
             InitializeComponent();
             InitializeFileWatcher();
-            InitializeDirectInput();
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += Timer_Tick;
@@ -144,7 +144,9 @@ namespace Sim_Wheel_Config
                     string deviceID = device.Attribute("id")?.Value;
                     string deviceName = device.Element("DeviceName")?.Value;
                     string ledCount = device.Element("LEDCount")?.Value;
-                    string deviceComPort = device.Element("DeviceComPort")?.Value;
+                    string devicePID = device.Element("DevicePID")?.Value;
+                    string deviceVID = device.Element("DeviceVID")?.Value;
+                    string deviceComPort = GetComPortFromVIDPID(deviceVID, devicePID);
 
                     // RGB Strip Page Setup
                     if (deviceType == "RGBStrip")
@@ -232,7 +234,6 @@ namespace Sim_Wheel_Config
                             MainWindowDisplayDeviceName = deviceName;
                             MainWindowDisplayDeviceLEDCount = ledCount;
                             MainWindowDisplayDeviceComPort = deviceComPort;
-                            MainWindowDisplayDeviceStatus = deviceStatus;
                             MainFrame.Navigate(new RGBStripPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
                         };
                         MainGrid.Children.Add(button);
@@ -326,7 +327,6 @@ namespace Sim_Wheel_Config
                             MainWindowDisplayDeviceName = deviceName;
                             MainWindowDisplayDeviceLEDCount = ledCount;
                             MainWindowDisplayDeviceComPort = deviceComPort;
-                            MainWindowDisplayDeviceStatus = deviceStatus;
                             MainFrame.Navigate(new WheelPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
                         };
                         MainGrid.Children.Add(button);
@@ -358,6 +358,45 @@ namespace Sim_Wheel_Config
                 MainGrid.Children.Remove(foundSendColorButton);
                 UnregisterName("MainWindowDisplaySendColorButton");
             }
+        }
+
+        public static string GetComPortFromVIDPID(string vid, string pid)
+        {
+            string comPort = null;
+            string searchPattern = $"VID_{vid}&PID_{pid}";
+
+            RegistryKey usbDevicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Enum\USB");
+
+            if (usbDevicesKey != null)
+            {
+                foreach (string subKeyName in usbDevicesKey.GetSubKeyNames())
+                {
+                    if (subKeyName.Contains(searchPattern))
+                    {
+                        RegistryKey deviceKey = usbDevicesKey.OpenSubKey(subKeyName);
+                        if (deviceKey != null)
+                        {
+                            foreach (string deviceInstance in deviceKey.GetSubKeyNames())
+                            {
+                                RegistryKey instanceKey = deviceKey.OpenSubKey(deviceInstance);
+                                if (instanceKey != null)
+                                {
+                                    RegistryKey deviceParamsKey = instanceKey.OpenSubKey("Device Parameters");
+                                    if (deviceParamsKey != null)
+                                    {
+                                        comPort = deviceParamsKey.GetValue("PortName") as string;
+                                        if (!string.IsNullOrEmpty(comPort))
+                                        {
+                                            return comPort;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return comPort;
         }
 
         private void DisconnectComPort()
