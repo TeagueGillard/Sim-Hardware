@@ -61,6 +61,7 @@ namespace Sim_Wheel_Config
                 });
             };
         }
+        public static Frame MainFrameInstance { get; private set; }
 
         public MainWindow()
         {
@@ -74,6 +75,7 @@ namespace Sim_Wheel_Config
             UpdateDevicesConnected();
             UpdateDevices();
             VersionNoLabel.Content = "V0.0.1a";
+            MainFrameInstance = MainFrame;
         }
 
 
@@ -326,8 +328,7 @@ namespace Sim_Wheel_Config
 
         private void AddNewDevice_Click(object sender, RoutedEventArgs e)
         {
-            NewDevice NewDeviceWindow = new NewDevice();
-            NewDeviceWindow.Show();
+            MainFrame.Navigate(new AddNewDevice.NewDevicePage());
         }
 
         private void RemoveDeviceControls()
