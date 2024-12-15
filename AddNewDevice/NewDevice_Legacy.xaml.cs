@@ -6,12 +6,12 @@ using System.Xml.Linq;
 
 namespace Sim_Wheel_Config
 {
-    public partial class NewDevice : Window
+    public partial class NewDevice_Legacy : Window
     {
 
         private SerialPort _serialPort;
 
-        public NewDevice()
+        public NewDevice_Legacy()
         {
             InitializeComponent();
         }
