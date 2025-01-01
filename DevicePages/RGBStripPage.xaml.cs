@@ -273,6 +273,33 @@ namespace Sim_Wheel_Config
             RegisterName(newButton.Name, newButton);
             RGBStripPageGrid.Children.Add(newButton);
         }
+        private void UpdateOrCreateSimhubButton(string buttonName, string content, Thickness margin, double width, double height, string command)
+        {
+
+            Button foundButton = (Button)RGBStripPageGrid.FindName(buttonName);
+
+            if (foundButton != null)
+            {
+                RGBStripPageGrid.Children.Remove(foundButton);
+                UnregisterName(buttonName);
+            }
+
+            Button newButton = new Button()
+            {
+                Name = buttonName,
+                Content = content,
+                Margin = margin,
+                Width = width,
+                Height = height,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+
+            newButton.Tag = new { command };
+            newButton.Click += SimhubButton_Click;
+            RegisterName(newButton.Name, newButton);
+            RGBStripPageGrid.Children.Add(newButton);
+        }
         private void UpdateOrCreateSendColorButton(string buttonName, string content, Thickness margin, double width, double height, string command)
         {
 
@@ -362,6 +389,15 @@ namespace Sim_Wheel_Config
                 "RainbowWave"
                 );
 
+                UpdateOrCreateSimhubButton(
+                "MainWindowDisplaySimhubButton",
+                "Connect to Simhub",
+                new Thickness(700, 161, 0, 0),
+                200,
+                20,
+                "Simhub"
+                );
+
                 UpdateOrCreateSendColorButton(
                 "MainWindowDisplaySendColorButton",
                 "Send Color",
@@ -446,7 +482,31 @@ namespace Sim_Wheel_Config
             {
                 if (_serialPort != null && _serialPort.IsOpen)
                 {
-                    _serialPort.WriteLine("rainbow_wave"); // Send the command to Arduino to start rainbow wave
+                    _serialPort.WriteLine("led: 3, rainbow_wave, ee"); // Send the command to Arduino to start rainbow wave
+                }
+                else
+                {
+                    Xceed.Wpf.Toolkit.MessageBox.Show("COM port is not open.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Xceed.Wpf.Toolkit.MessageBox.Show($"Error opening COM port: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+        }
+        private void SimhubButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = (Button)sender;
+
+            var buttonData = (dynamic)clickedButton.Tag;
+            string command = buttonData.command;
+            // Open the selected COM port
+            try
+            {
+                if (_serialPort != null && _serialPort.IsOpen)
+                {
+                    _serialPort.WriteLine("SIMHUB, ee"); // Send the command to Arduino to start rainbow wave
                 }
                 else
                 {
@@ -472,7 +532,7 @@ namespace Sim_Wheel_Config
                     byte green = selectedColor.G;
                     byte blue = selectedColor.B;
 
-                    string colorString = $"red: {red}, green: {green}, blue: {blue},";
+                    string colorString = $"led: 3, red: {red}, green: {green}, blue: {blue}, ee"; // CHANGE THIS LATER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                     if (_serialPort != null && _serialPort.IsOpen)
                     {
