@@ -595,7 +595,7 @@ namespace Sim_Wheel_Config
 
                 UpdateOrCreateSendColorButton1(
                 "MainWindowDisplaySendColorButton1",
-                "Send Color",
+                "Send Color 1",
                 new Thickness(500, 140, 0, 0),
                 200,
                 20,
@@ -603,7 +603,7 @@ namespace Sim_Wheel_Config
                 );
                 UpdateOrCreateSendColorButton2(
                 "MainWindowDisplaySendColorButton2",
-                "Send Color",
+                "Send Color 2",
                 new Thickness(500, 190, 0, 0),
                 200,
                 20,
@@ -611,7 +611,7 @@ namespace Sim_Wheel_Config
                 );
                 UpdateOrCreateSendColorButton3(
                 "MainWindowDisplaySendColorButton3",
-                "Send Color",
+                "Send Color 3",
                 new Thickness(500, 240, 0, 0),
                 200,
                 20,
@@ -619,7 +619,7 @@ namespace Sim_Wheel_Config
                 );
                 UpdateOrCreateSendColorButton4(
                 "MainWindowDisplaySendColorButton4",
-                "Send Color",
+                "Send Color 4",
                 new Thickness(500, 290, 0, 0),
                 200,
                 20,
