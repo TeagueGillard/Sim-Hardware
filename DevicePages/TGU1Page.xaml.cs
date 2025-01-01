@@ -835,16 +835,16 @@ namespace Sim_Wheel_Config
 
                 if (colorPicker1.SelectedColor.HasValue)
                 {
-                    var selectedColor = colorPicker1.SelectedColor.Value;
-                    byte red = selectedColor.R;
-                    byte green = selectedColor.G;
-                    byte blue = selectedColor.B;
+                    var selectedColor1 = colorPicker1.SelectedColor.Value;
+                    byte red1 = selectedColor1.R;
+                    byte green1 = selectedColor1.G;
+                    byte blue1 = selectedColor1.B;
 
-                    string colorString = $"led: 1, red: {red}, green: {green}, blue: {blue}, ee";
+                    string colorString1 = $"led: 1, red: {red1}, green: {green1}, blue: {blue1}, ee";
 
                     if (_serialPort != null && _serialPort.IsOpen)
                     {
-                        _serialPort.WriteLine(colorString);
+                        _serialPort.WriteLine(colorString1);
                     }
                     else
                     {
@@ -871,16 +871,16 @@ namespace Sim_Wheel_Config
 
                 if (colorPicker2.SelectedColor.HasValue)
                 {
-                    var selectedColor = colorPicker2.SelectedColor.Value;
-                    byte red = selectedColor.R;
-                    byte green = selectedColor.G;
-                    byte blue = selectedColor.B;
+                    var selectedColor2 = colorPicker2.SelectedColor.Value;
+                    byte red2 = selectedColor2.R;
+                    byte green2 = selectedColor2.G;
+                    byte blue2 = selectedColor2.B;
 
-                    string colorString = $"led: 2, red: {red}, green: {green}, blue: {blue}, ee";
+                    string colorString2 = $"led: 2, red: {red2}, green: {green2}, blue: {blue2}, ee";
 
                     if (_serialPort != null && _serialPort.IsOpen)
                     {
-                        _serialPort.WriteLine(colorString);
+                        _serialPort.WriteLine(colorString2);
                     }
                     else
                     {
@@ -907,16 +907,16 @@ namespace Sim_Wheel_Config
 
                 if (colorPicker3.SelectedColor.HasValue)
                 {
-                    var selectedColor = colorPicker3.SelectedColor.Value;
-                    byte red = selectedColor.R;
-                    byte green = selectedColor.G;
-                    byte blue = selectedColor.B;
+                    var selectedColor3 = colorPicker3.SelectedColor.Value;
+                    byte red3 = selectedColor3.R;
+                    byte green3 = selectedColor3.G;
+                    byte blue3 = selectedColor3.B;
 
-                    string colorString = $"led: 3, red: {red}, green: {green}, blue: {blue}, ee";
+                    string colorString3 = $"led: 3, red: {red3}, green: {green3}, blue: {blue3}, ee";
 
                     if (_serialPort != null && _serialPort.IsOpen)
                     {
-                        _serialPort.WriteLine(colorString);
+                        _serialPort.WriteLine(colorString3);
                     }
                     else
                     {
@@ -943,16 +943,16 @@ namespace Sim_Wheel_Config
 
                 if (colorPicker4.SelectedColor.HasValue)
                 {
-                    var selectedColor = colorPicker4.SelectedColor.Value;
-                    byte red = selectedColor.R;
-                    byte green = selectedColor.G;
-                    byte blue = selectedColor.B;
+                    var selectedColor4 = colorPicker4.SelectedColor.Value;
+                    byte red4 = selectedColor4.R;
+                    byte green4 = selectedColor4.G;
+                    byte blue4 = selectedColor4.B;
 
-                    string colorString = $"led: 4, red: {red}, green: {green}, blue: {blue}, ee";
+                    string colorString4 = $"led: 4, red: {red4}, green: {green4}, blue: {blue4}, ee";
 
                     if (_serialPort != null && _serialPort.IsOpen)
                     {
-                        _serialPort.WriteLine(colorString);
+                        _serialPort.WriteLine(colorString4);
                     }
                     else
                     {
@@ -1028,7 +1028,7 @@ namespace Sim_Wheel_Config
             // Create and initialize the ColorPicker
             colorPicker3 = new ColorPicker()
             {
-                Name = "colorPicker1",
+                Name = "colorPicker3",
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(290, 240, 0, 0),
@@ -1051,7 +1051,7 @@ namespace Sim_Wheel_Config
             // Create and initialize the ColorPicker
             colorPicker4 = new ColorPicker()
             {
-                Name = "colorPicker2",
+                Name = "colorPicker4",
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(290, 290, 0, 0),
