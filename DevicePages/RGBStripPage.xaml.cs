@@ -377,7 +377,6 @@ namespace Sim_Wheel_Config
                 MainWindowDisplayDeviceStatus
                 );
 
-                MessageBox.Show($"Connected to Com Port: {deviceComPort}\nLED Count: {ledCount}");
                 AddColorPicker();
 
                 UpdateOrCreateRainbowWaveButton(
@@ -392,7 +391,7 @@ namespace Sim_Wheel_Config
                 UpdateOrCreateSimhubButton(
                 "MainWindowDisplaySimhubButton",
                 "Connect to Simhub",
-                new Thickness(700, 161, 0, 0),
+                new Thickness(600, 111, 0, 0),
                 200,
                 20,
                 "Simhub"
@@ -482,7 +481,7 @@ namespace Sim_Wheel_Config
             {
                 if (_serialPort != null && _serialPort.IsOpen)
                 {
-                    _serialPort.WriteLine("led: 3, rainbow_wave, ee"); // Send the command to Arduino to start rainbow wave
+                    _serialPort.WriteLine("led: 1, rainbow_wave, ee"); // Send the command to Arduino to start rainbow wave
                 }
                 else
                 {
@@ -507,6 +506,7 @@ namespace Sim_Wheel_Config
                 if (_serialPort != null && _serialPort.IsOpen)
                 {
                     _serialPort.WriteLine("SIMHUB, ee"); // Send the command to Arduino to start rainbow wave
+                    _serialPort.Close();    // Close serial port so SimHub can communicate with the Arduino
                 }
                 else
                 {
@@ -532,7 +532,7 @@ namespace Sim_Wheel_Config
                     byte green = selectedColor.G;
                     byte blue = selectedColor.B;
 
-                    string colorString = $"led: 3, red: {red}, green: {green}, blue: {blue}, ee"; // CHANGE THIS LATER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    string colorString = $"led: 1, red: {red}, green: {green}, blue: {blue}, ee";
 
                     if (_serialPort != null && _serialPort.IsOpen)
                     {
