@@ -74,7 +74,7 @@ namespace Sim_Wheel_Config
             _timer.Start();
             UpdateDevicesConnected();
             UpdateDevices();
-            VersionNoLabel.Content = "V0.0.4a";
+            VersionNoLabel.Content = "V0.0.5-alpha";
             MainFrameInstance = MainFrame;
         }
 
@@ -322,103 +322,103 @@ namespace Sim_Wheel_Config
 
                         verticalPosition += 20;
 
-                        }
+                    }
 
-                        if (deviceType == "TGU1")
+                    if (deviceType == "TGU1")
+                    {
+                        MainGrid.Children.Add(new Label()
                         {
-                            MainGrid.Children.Add(new Label()
-                            {
-                                Tag = "DeviceLabel",
-                                Content = deviceName,
-                                HorizontalAlignment = HorizontalAlignment.Left,
-                                VerticalAlignment = VerticalAlignment.Top,
-                                Margin = new Thickness(40, verticalPosition, 0, 0),
-                                FontSize = 16,
-                                Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                            });
-                            verticalPosition += 20;
+                            Tag = "DeviceLabel",
+                            Content = deviceName,
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(40, verticalPosition, 0, 0),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
 
-                            MainGrid.Children.Add(new Label()
-                            {
-                                Tag = "DeviceLabel",
-                                Content = "TG - U1 Device",
-                                HorizontalAlignment = HorizontalAlignment.Left,
-                                VerticalAlignment = VerticalAlignment.Top,
-                                Margin = new Thickness(50, verticalPosition, 0, 120),
-                                FontSize = 16,
-                                Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                            });
-                            verticalPosition += 20;
+                        MainGrid.Children.Add(new Label()
+                        {
+                            Tag = "DeviceLabel",
+                            Content = "TG - U1 Device",
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(50, verticalPosition, 0, 120),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
 
-                            MainGrid.Children.Add(new Label()
-                            {
-                                Tag = "DeviceLabel",
-                                Content = $"{ledCount} Leds",
-                                HorizontalAlignment = HorizontalAlignment.Left,
-                                VerticalAlignment = VerticalAlignment.Top,
-                                Margin = new Thickness(50, verticalPosition, 0, 40),
-                                FontSize = 16,
-                                Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                            });
-                            verticalPosition += 20;
+                        MainGrid.Children.Add(new Label()
+                        {
+                            Tag = "DeviceLabel",
+                            Content = $"{ledCount} Leds",
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(50, verticalPosition, 0, 40),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
 
-                            MainGrid.Children.Add(new Label()
-                            {
-                                Tag = "DeviceLabel",
-                                Content = deviceComPort,
-                                HorizontalAlignment = HorizontalAlignment.Left,
-                                VerticalAlignment = VerticalAlignment.Top,
-                                Margin = new Thickness(50, verticalPosition, 0, 0),
-                                FontSize = 16,
-                                Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                            });
-                            verticalPosition += 20;
+                        MainGrid.Children.Add(new Label()
+                        {
+                            Tag = "DeviceLabel",
+                            Content = deviceComPort,
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(50, verticalPosition, 0, 0),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+                        });
+                        verticalPosition += 20;
 
-                            Image image = new Image()
-                            {
-                                HorizontalAlignment = HorizontalAlignment.Left,
-                                VerticalAlignment = VerticalAlignment.Top,
-                                Height = 120,
-                                Width = 120,
-                                Margin = new Thickness(130, verticalPosition - 70, 0, 0),
-                                Source = new BitmapImage(new Uri("pack://application:,,,/Resources/RGB-STRIP.png"))
-                            };
-                            MainGrid.Children.Add(image);
+                        Image image = new Image()
+                        {
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Height = 120,
+                            Width = 120,
+                            Margin = new Thickness(130, verticalPosition - 70, 0, 0),
+                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/RGB-STRIP.png"))
+                        };
+                        MainGrid.Children.Add(image);
 
-                            string LED1 = device.Element("LED1")?.Value;
-                            string LED2 = device.Element("LED2")?.Value;
-                            string LED3 = device.Element("LED3")?.Value;
-                            string LED4 = device.Element("LED4")?.Value;
+                        string LED1 = device.Element("LED1")?.Value;
+                        string LED2 = device.Element("LED2")?.Value;
+                        string LED3 = device.Element("LED3")?.Value;
+                        string LED4 = device.Element("LED4")?.Value;
 
                         Button button = new Button()
-                            {
-                                Content = "",
-                                HorizontalAlignment = HorizontalAlignment.Left,
-                                VerticalAlignment = VerticalAlignment.Top,
-                                Margin = new Thickness(30, verticalPosition - 80, 0, 0),
-                                FontSize = 16,
-                                Foreground = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
-                                Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
-                                Width = 200,
-                                Height = 95,
-                                Tag = deviceName,
-                            };
-                            button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
-                            button.Click += (sender, e) =>
-                            {
-                                RemoveDeviceControls();
-                                DisconnectComPort();
-                                string deviceStatus = "Not Connected";
-                                MainWindowDisplayDeviceType = deviceType;
-                                MainWindowDisplayDeviceID = deviceID;
-                                MainWindowDisplayDeviceName = deviceName;
-                                MainWindowDisplayDeviceLEDCount = ledCount;
-                                MainWindowDisplayDeviceComPort = deviceComPort;
-                                MainFrame.Navigate(new TGU1Page(deviceType, deviceID, deviceName, ledCount, deviceComPort, LED1, LED2, LED3, LED4));
-                            };
-                            MainGrid.Children.Add(button);
+                        {
+                            Content = "",
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Margin = new Thickness(30, verticalPosition - 80, 0, 0),
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                            Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                            Width = 200,
+                            Height = 95,
+                            Tag = deviceName,
+                        };
+                        button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
+                        button.Click += (sender, e) =>
+                        {
+                            RemoveDeviceControls();
+                            DisconnectComPort();
+                            string deviceStatus = "Not Connected";
+                            MainWindowDisplayDeviceType = deviceType;
+                            MainWindowDisplayDeviceID = deviceID;
+                            MainWindowDisplayDeviceName = deviceName;
+                            MainWindowDisplayDeviceLEDCount = ledCount;
+                            MainWindowDisplayDeviceComPort = deviceComPort;
+                            MainFrame.Navigate(new TGU1Page(deviceType, deviceID, deviceName, ledCount, deviceComPort, LED1, LED2, LED3, LED4));
+                        };
+                        MainGrid.Children.Add(button);
 
-                            verticalPosition += 20;
+                        verticalPosition += 20;
                     }
                 }
             }
