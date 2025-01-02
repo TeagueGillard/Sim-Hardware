@@ -23,7 +23,7 @@
 
         <!-- Version info Display -->
         <Label x:Name="VersionNoLabel" Content="Version" HorizontalAlignment="Right" Margin="0,0,5,-4" VerticalAlignment="Bottom" Foreground="White" Grid.ColumnSpan="2"/>
-        <Label x:Name="VersionLabel" Content="Version:" HorizontalAlignment="Right" Margin="0,0,50,-4" VerticalAlignment="Bottom" Foreground="White"/>
+        <Label x:Name="VersionLabel" Content="Version:" HorizontalAlignment="Right" Margin="0,0,75,-4" VerticalAlignment="Bottom" Foreground="White"/>
 
         <!-- Connected Device Counter -->
         <Label x:Name="DevicesLabel" Content="No Devices Connected" HorizontalAlignment="Left" Margin="33,22,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
