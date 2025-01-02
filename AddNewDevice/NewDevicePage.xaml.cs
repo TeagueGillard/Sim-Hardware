@@ -21,5 +21,9 @@ namespace Sim_Wheel_Config.AddNewDevice
         {
             MainWindow.MainFrameInstance.Navigate(new NewWheelPage());
         }
+        private void AddTGU1DeviceButton_Click(Object sender, RoutedEventArgs e)
+        {
+            MainWindow.MainFrameInstance.Navigate(new NewTGU1Page());
+        }
     }
 }
