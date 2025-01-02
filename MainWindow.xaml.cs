@@ -215,7 +215,6 @@ namespace Sim_Wheel_Config
                         button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
                         button.Click += (sender, e) =>
                         {
-                            RemoveDeviceControls();
                             DisconnectComPort();
                             string deviceStatus = "Not Connected";
                             MainWindowDisplayDeviceType = deviceType;
@@ -308,7 +307,6 @@ namespace Sim_Wheel_Config
                         button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
                         button.Click += (sender, e) =>
                         {
-                            RemoveDeviceControls();
                             DisconnectComPort();
                             string deviceStatus = "Not Connected";
                             MainWindowDisplayDeviceType = deviceType;
@@ -406,7 +404,6 @@ namespace Sim_Wheel_Config
                         button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
                         button.Click += (sender, e) =>
                         {
-                            RemoveDeviceControls();
                             DisconnectComPort();
                             string deviceStatus = "Not Connected";
                             MainWindowDisplayDeviceType = deviceType;
@@ -417,8 +414,8 @@ namespace Sim_Wheel_Config
                             MainFrame.Navigate(new TGU1Page(deviceType, deviceID, deviceName, ledCount, deviceComPort, LED1, LED2, LED3, LED4));
                         };
                         MainGrid.Children.Add(button);
-
                         verticalPosition += 20;
+
                     }
                 }
             }
@@ -427,23 +424,6 @@ namespace Sim_Wheel_Config
         private void AddNewDevice_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(new AddNewDevice.NewDevicePage());
-        }
-
-        private void RemoveDeviceControls()
-        {
-            MainGrid.Children.Remove(colorPicker);
-            Button foundRainBowButton = (Button)MainGrid.FindName("MainWindowDisplayRainbowWaveButton");
-            if (foundRainBowButton != null)
-            {
-                MainGrid.Children.Remove(foundRainBowButton);
-                UnregisterName("MainWindowDisplayRainbowWaveButton");
-            }
-            Button foundSendColorButton = (Button)MainGrid.FindName("MainWindowDisplaySendColorButton");
-            if (foundSendColorButton != null)
-            {
-                MainGrid.Children.Remove(foundSendColorButton);
-                UnregisterName("MainWindowDisplaySendColorButton");
-            }
         }
 
         public static string GetComPortFromVIDPID(string vid, string pid)

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using SharpDX.DirectInput;
+using System.IO;
 using System.IO.Ports;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,7 +17,7 @@ namespace Sim_Wheel_Config
     public partial class TGU1Page : Page
     {
         private SerialPort _serialPort;
-        private DispatcherTimer _timer;
+        private DispatcherTimer _deviceCheckTimer;
         private int totalDevices = 0;
         private int deviceNumber = 0;
         private string MainWindowDisplayDeviceType = "0";
@@ -31,7 +32,10 @@ namespace Sim_Wheel_Config
         private string MainWindowDisplayCurrentDeviceComPort = "No Device";
         private string MainWindowDisplayDeviceStatus = "Not Connected";
         private string MainWindowDisplayCurrentDeviceStatus = "Not Connected";
-        private FileSystemWatcher fileWatcher;
+        private string MainWindowDisplayDeviceLED1 = "0";
+        private string MainWindowDisplayDeviceLED2 = "0";
+        private string MainWindowDisplayDeviceLED3 = "0";
+        private string MainWindowDisplayDeviceLED4 = "0";
         private ColorPicker colorPicker1;
         private ColorPicker colorPicker2;
         private ColorPicker colorPicker3;
@@ -45,8 +49,13 @@ namespace Sim_Wheel_Config
             MainWindowDisplayDeviceName = deviceName;
             MainWindowDisplayDeviceLEDCount = ledCount;
             MainWindowDisplayDeviceComPort = deviceComPort;
+            MainWindowDisplayDeviceLED1 = LED1;
+            MainWindowDisplayDeviceLED2 = LED2;
+            MainWindowDisplayDeviceLED3 = LED3;
+            MainWindowDisplayDeviceLED4 = LED4;
             InitializeComponent();
             DeviceDisplay();
+            StartDeviceCheckTimer();
             this.Unloaded += Page_Unloaded;
         }
 
@@ -535,7 +544,7 @@ namespace Sim_Wheel_Config
                 _serialPort = new SerialPort(deviceComPort, 115200); // Set the port and baud rate
                 _serialPort.Open(); // Open the COM port
                 MainWindowDisplayDeviceStatus = "Connected";
-
+                
                 UpdateOrCreateStatusLabel(
                 "MainWindowDisplayDeviceStatusLabel",
                 $"Status: {MainWindowDisplayDeviceStatus}",
@@ -814,6 +823,10 @@ namespace Sim_Wheel_Config
                     MainWindowDisplayDeviceStatus
                     );
 
+                    _deviceCheckTimer.Stop();
+                    TGU1Page SimhubNewPage = new TGU1Page(MainWindowDisplayDeviceType, MainWindowDisplayDeviceID, MainWindowDisplayDeviceName, MainWindowDisplayDeviceLEDCount, MainWindowDisplayDeviceComPort, MainWindowDisplayDeviceLED1, MainWindowDisplayDeviceLED2, MainWindowDisplayDeviceLED3, MainWindowDisplayDeviceLED4);
+                    NavigationService.Navigate(SimhubNewPage);       // Creates a new page with same info as current page then navigatges to it ( Reloads the current page and resets the state)
+
                 }
                 else
                 {
@@ -1067,6 +1080,24 @@ namespace Sim_Wheel_Config
 
             // Add the ColorPicker to the TGU1PageGrid
             TGU1PageGrid.Children.Add(colorPicker4);
+        }
+
+        private void StartDeviceCheckTimer()
+        {
+            _deviceCheckTimer = new DispatcherTimer();
+            _deviceCheckTimer.Interval = TimeSpan.FromSeconds(1);
+            _deviceCheckTimer.Tick += (sender, e) => CheckDeviceConnection();
+            _deviceCheckTimer.Start();
+        }
+
+        private void CheckDeviceConnection()
+        {
+            if (_serialPort != null && !_serialPort.IsOpen)
+            {
+                _deviceCheckTimer.Stop();
+                TGU1Page CheckDeviceConnectionNewPage = new TGU1Page(MainWindowDisplayDeviceType, MainWindowDisplayDeviceID, MainWindowDisplayDeviceName, MainWindowDisplayDeviceLEDCount, MainWindowDisplayDeviceComPort, MainWindowDisplayDeviceLED1, MainWindowDisplayDeviceLED2, MainWindowDisplayDeviceLED3, MainWindowDisplayDeviceLED4);
+                NavigationService.Navigate(CheckDeviceConnectionNewPage);       // Creates a new page with same info as current page then navigatges to it ( Reloads the current page and resets the state)
+            }
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
