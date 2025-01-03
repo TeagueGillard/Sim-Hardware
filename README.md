@@ -2,17 +2,13 @@
 Sim Hardware is an app that directly controls and adjusts your sim racing hardware without needing to reflash the firmware whenever you want to change a setting.
 
 ## Compatible Devices:
-[TG - U1](https://github.com/TeagueGillard/TG-U1) - Full LED Support, input display coming in the next update, control adjustments coming soon!
+| Device Name: | LED Support: | Input Display: | Control Adjustments: |
+| --- | --- | --- | --- |
+| [TG - U1](https://github.com/TeagueGillard/TG-U1) | Full Led Support | Coming Soon! | Coming Soon! |
+| TG - 911-GT3-R | No LEDS | Coming Soon! | Not Supported |
+| TG - MCL22 | Full Led Support | Coming Soon! | Not Supported |
+| TG - A523 | Full Led Support | Coming Soon! | Not Supported |
+| TG - W13 | Full Led Support | Coming Soon! | Coming Soon! |
+| TG - FE22 | Full Led Support | Coming Soon! | Coming Soon! |
 
-TG - 911-GT3-R - Full LED Support, input display coming in the next update, control adjustments coming soon!
-
-TG - MCL22 - Full LED Support, input display coming in the next update!
-
-TG - A523 - Full LED Support, input display coming in the next update!
-
-TG - W13 - Full LED Support, input display coming in the next update, control adjustments coming soon!
-
-TG - FE22 - Full LED Support, input display coming in the next update, control adjustments coming soon!
-
-
-> If you would like your device added, please contact me [here](mailto:teaguegillard@gmail.com) or create a [Pull Request](https://github.com/TeagueGillard/Sim-Hardware/pulls)
+> If you would like your device added, please get in touch with me [here](mailto:teaguegillard@gmail.com) or create a [Pull Request](https://github.com/TeagueGillard/Sim-Hardware/pulls)
