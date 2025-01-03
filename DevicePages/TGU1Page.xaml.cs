@@ -30,6 +30,8 @@ namespace Sim_Wheel_Config
         private string MainWindowDisplayCurrentDeviceLEDCount = "No Device";
         private string MainWindowDisplayDeviceComPort = "0";
         private string MainWindowDisplayCurrentDeviceComPort = "No Device";
+        private string MainWindowDisplayDeviceInputDevice= "0";
+        private string MainWindowDisplayCurrentDeviceInputDevice = "No Device";
         private string MainWindowDisplayDeviceStatus = "Not Connected";
         private string MainWindowDisplayCurrentDeviceStatus = "Not Connected";
         private string MainWindowDisplayDeviceLED1 = "0";
@@ -42,20 +44,20 @@ namespace Sim_Wheel_Config
         private ColorPicker colorPicker4;
 
 
-        public TGU1Page(string deviceType, string deviceID, string deviceName, string ledCount, string deviceComPort, string LED1, string LED2, string LED3, string LED4)
+        public TGU1Page(string deviceType, string deviceID, string deviceName, string ledCount, string deviceComPort, string inputDevice, string LED1, string LED2, string LED3, string LED4)
         {
             MainWindowDisplayDeviceType = deviceType;
             MainWindowDisplayDeviceID = deviceID;
             MainWindowDisplayDeviceName = deviceName;
             MainWindowDisplayDeviceLEDCount = ledCount;
             MainWindowDisplayDeviceComPort = deviceComPort;
+            MainWindowDisplayDeviceInputDevice = inputDevice;
             MainWindowDisplayDeviceLED1 = LED1;
             MainWindowDisplayDeviceLED2 = LED2;
             MainWindowDisplayDeviceLED3 = LED3;
             MainWindowDisplayDeviceLED4 = LED4;
             InitializeComponent();
             DeviceDisplay();
-            StartDeviceCheckTimer();
             this.Unloaded += Page_Unloaded;
         }
 
@@ -229,6 +231,33 @@ namespace Sim_Wheel_Config
 
             newButton.Tag = new { deviceComPort, ledCount };
             newButton.Click += ConnectButton_Click;
+            RegisterName(newButton.Name, newButton);
+            TGU1PageGrid.Children.Add(newButton);
+        }
+        private void UpdateOrCreateDisconnectButton(string buttonName, string content, Thickness margin, double width, double height, string deviceComPort, string ledCount)
+        {
+
+            Button foundButton = (Button)TGU1PageGrid.FindName(buttonName);
+
+            if (foundButton != null)
+            {
+                TGU1PageGrid.Children.Remove(foundButton);
+                UnregisterName(buttonName);
+            }
+
+            Button newButton = new Button()
+            {
+                Name = buttonName,
+                Content = content,
+                Margin = margin,
+                Width = width,
+                Height = height,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+
+            newButton.Tag = new { deviceComPort, ledCount };
+            newButton.Click += DisconnectButton_Click;
             RegisterName(newButton.Name, newButton);
             TGU1PageGrid.Children.Add(newButton);
         }
@@ -535,6 +564,7 @@ namespace Sim_Wheel_Config
         {
             Button clickedButton = (Button)sender;
 
+            StartDeviceCheckTimer();
             var buttonData = (dynamic)clickedButton.Tag;
             string deviceComPort = buttonData.deviceComPort;
             string ledCount = buttonData.ledCount;
@@ -554,43 +584,107 @@ namespace Sim_Wheel_Config
                 MainWindowDisplayDeviceStatus
                 );
 
-                AddColorPicker1();
-                AddColorPicker2();
-                AddColorPicker3();
-                AddColorPicker4();
+                UpdateOrCreateDisconnectButton(
+                "MainWindowDisplayDeviceConnectButton",
+                "Disconnect",
+                new Thickness(852, 111, 0, 0),
+                100,
+                20,
+                MainWindowDisplayDeviceComPort,
+                MainWindowDisplayDeviceLEDCount
+                );
 
-                UpdateOrCreateRainbowWaveButton1(
-                "MainWindowDisplayRainbowWaveButton1",
-                "Rainbow Wave",
-                new Thickness(700, 140, 0, 0),
-                200,
-                20,
-                "RainbowWave"
-                );
-                UpdateOrCreateRainbowWaveButton2(
-                "MainWindowDisplayRainbowWaveButton2",
-                "Rainbow Wave",
-                new Thickness(700, 190, 0, 0),
-                200,
-                20,
-                "RainbowWave"
-                );
-                UpdateOrCreateRainbowWaveButton3(
-                "MainWindowDisplayRainbowWaveButton3",
-                "Rainbow Wave",
-                new Thickness(700, 240, 0, 0),
-                200,
-                20,
-                "RainbowWave"
-                );
-                UpdateOrCreateRainbowWaveButton4(
-                "MainWindowDisplayRainbowWaveButton4",
-                "Rainbow Wave",
-                new Thickness(700, 290, 0, 0),
-                200,
-                20,
-                "RainbowWave"
-                );
+                if (MainWindowDisplayDeviceLED1 == "true")
+                {
+                    AddColorPicker1();
+
+                    UpdateOrCreateRainbowWaveButton1(
+                    "MainWindowDisplayRainbowWaveButton1",
+                    "Rainbow Wave",
+                    new Thickness(700, 140, 0, 0),
+                    200,
+                    20,
+                    "RainbowWave"
+                    );
+
+                    UpdateOrCreateSendColorButton1(
+                    "MainWindowDisplaySendColorButton1",
+                    "Send Color 1",
+                    new Thickness(500, 140, 0, 0),
+                    200,
+                    20,
+                    "SendColor"
+                    );
+
+                }
+                if (MainWindowDisplayDeviceLED2 == "true")
+                {
+                    AddColorPicker2();
+
+                    UpdateOrCreateRainbowWaveButton2(
+                    "MainWindowDisplayRainbowWaveButton2",
+                    "Rainbow Wave",
+                    new Thickness(700, 190, 0, 0),
+                    200,
+                    20,
+                    "RainbowWave"
+                    );
+
+                    UpdateOrCreateSendColorButton2(
+                    "MainWindowDisplaySendColorButton2",
+                    "Send Color 2",
+                    new Thickness(500, 190, 0, 0),
+                    200,
+                    20,
+                    "SendColor"
+                    );
+
+                }
+                if (MainWindowDisplayDeviceLED3 == "true")
+                {
+                    AddColorPicker3();
+
+                    UpdateOrCreateRainbowWaveButton3(
+                    "MainWindowDisplayRainbowWaveButton3",
+                    "Rainbow Wave",
+                    new Thickness(700, 240, 0, 0),
+                    200,
+                    20,
+                    "RainbowWave"
+                    );
+
+                    UpdateOrCreateSendColorButton3(
+                    "MainWindowDisplaySendColorButton3",
+                    "Send Color 3",
+                    new Thickness(500, 240, 0, 0),
+                    200,
+                    20,
+                    "SendColor"
+                    );
+
+                }
+                if (MainWindowDisplayDeviceLED4 == "true")
+                {
+                    AddColorPicker4();
+                    UpdateOrCreateRainbowWaveButton4(
+                    "MainWindowDisplayRainbowWaveButton4",
+                    "Rainbow Wave",
+                    new Thickness(700, 290, 0, 0),
+                    200,
+                    20,
+                    "RainbowWave"
+                    );
+
+                    UpdateOrCreateSendColorButton4(
+                    "MainWindowDisplaySendColorButton4",
+                    "Send Color 4",
+                    new Thickness(500, 290, 0, 0),
+                    200,
+                    20,
+                    "SendColor"
+                    );
+
+                }
 
                 UpdateOrCreateSimhubButton(
                 "MainWindowDisplaySimhubButton",
@@ -601,38 +695,6 @@ namespace Sim_Wheel_Config
                 "Simhub"
                 );
 
-                UpdateOrCreateSendColorButton1(
-                "MainWindowDisplaySendColorButton1",
-                "Send Color 1",
-                new Thickness(500, 140, 0, 0),
-                200,
-                20,
-                "SendColor"
-                );
-                UpdateOrCreateSendColorButton2(
-                "MainWindowDisplaySendColorButton2",
-                "Send Color 2",
-                new Thickness(500, 190, 0, 0),
-                200,
-                20,
-                "SendColor"
-                );
-                UpdateOrCreateSendColorButton3(
-                "MainWindowDisplaySendColorButton3",
-                "Send Color 3",
-                new Thickness(500, 240, 0, 0),
-                200,
-                20,
-                "SendColor"
-                );
-                UpdateOrCreateSendColorButton4(
-                "MainWindowDisplaySendColorButton4",
-                "Send Color 4",
-                new Thickness(500, 290, 0, 0),
-                200,
-                20,
-                "SendColor"
-                );
             }
             catch (Exception ex)
             {
@@ -640,6 +702,14 @@ namespace Sim_Wheel_Config
             }
 
         }
+        private void DisconnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            _serialPort.Close();
+            _deviceCheckTimer.Stop();
+            TGU1Page CheckDeviceConnectionNewPage = new TGU1Page(MainWindowDisplayDeviceType, MainWindowDisplayDeviceID, MainWindowDisplayDeviceName, MainWindowDisplayDeviceLEDCount, MainWindowDisplayDeviceComPort, MainWindowDisplayDeviceInputDevice, MainWindowDisplayDeviceLED1, MainWindowDisplayDeviceLED2, MainWindowDisplayDeviceLED3, MainWindowDisplayDeviceLED4);
+            NavigationService.Navigate(CheckDeviceConnectionNewPage);       // Creates a new page with same info as current page then navigatges to it ( Reloads the current page and resets the state)
+        }
+
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             Button clickedButton = (Button)sender;
@@ -824,7 +894,7 @@ namespace Sim_Wheel_Config
                     );
 
                     _deviceCheckTimer.Stop();
-                    TGU1Page SimhubNewPage = new TGU1Page(MainWindowDisplayDeviceType, MainWindowDisplayDeviceID, MainWindowDisplayDeviceName, MainWindowDisplayDeviceLEDCount, MainWindowDisplayDeviceComPort, MainWindowDisplayDeviceLED1, MainWindowDisplayDeviceLED2, MainWindowDisplayDeviceLED3, MainWindowDisplayDeviceLED4);
+                    TGU1Page SimhubNewPage = new TGU1Page(MainWindowDisplayDeviceType, MainWindowDisplayDeviceID, MainWindowDisplayDeviceName, MainWindowDisplayDeviceLEDCount, MainWindowDisplayDeviceComPort, MainWindowDisplayDeviceInputDevice, MainWindowDisplayDeviceLED1, MainWindowDisplayDeviceLED2, MainWindowDisplayDeviceLED3, MainWindowDisplayDeviceLED4);
                     NavigationService.Navigate(SimhubNewPage);       // Creates a new page with same info as current page then navigatges to it ( Reloads the current page and resets the state)
 
                 }
@@ -1095,13 +1165,14 @@ namespace Sim_Wheel_Config
             if (_serialPort != null && !_serialPort.IsOpen)
             {
                 _deviceCheckTimer.Stop();
-                TGU1Page CheckDeviceConnectionNewPage = new TGU1Page(MainWindowDisplayDeviceType, MainWindowDisplayDeviceID, MainWindowDisplayDeviceName, MainWindowDisplayDeviceLEDCount, MainWindowDisplayDeviceComPort, MainWindowDisplayDeviceLED1, MainWindowDisplayDeviceLED2, MainWindowDisplayDeviceLED3, MainWindowDisplayDeviceLED4);
+                TGU1Page CheckDeviceConnectionNewPage = new TGU1Page(MainWindowDisplayDeviceType, MainWindowDisplayDeviceID, MainWindowDisplayDeviceName, MainWindowDisplayDeviceLEDCount, MainWindowDisplayDeviceComPort, MainWindowDisplayDeviceInputDevice, MainWindowDisplayDeviceLED1, MainWindowDisplayDeviceLED2, MainWindowDisplayDeviceLED3, MainWindowDisplayDeviceLED4);
                 NavigationService.Navigate(CheckDeviceConnectionNewPage);       // Creates a new page with same info as current page then navigatges to it ( Reloads the current page and resets the state)
             }
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
+            _deviceCheckTimer?.Stop();
             if (_serialPort != null && _serialPort.IsOpen)
             {
                 _serialPort.Close();

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using SharpDX.DirectInput;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -8,9 +9,13 @@ namespace Sim_Wheel_Config.AddNewDevice
 {
     public partial class NewTGU1Page : Page
     {
+        private DirectInput directInput;
+        private Joystick joystick;
+
         public NewTGU1Page()
         {
             InitializeComponent();
+            TGU1PopulateAndSetInputDevice();
         }
 
         private void TGU1LEDCountTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -22,9 +27,45 @@ namespace Sim_Wheel_Config.AddNewDevice
             return int.TryParse(text, out _);
         }
 
+        private void TGU1PopulateAndSetInputDevice()
+        {
+            try
+            {
+
+                directInput = new DirectInput();
+                var devices = directInput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AllDevices).ToList();
+
+                if (devices.Any())
+                {
+
+                    TGU1InputDeviceComboBox.ItemsSource = devices.Select(device => device.InstanceName).ToList();
+                    TGU1InputDeviceComboBox.SelectedIndex = 0;
+                    var selectedInputDevice = devices.First();
+                    joystick = new Joystick(directInput, selectedInputDevice.InstanceGuid);
+                }
+                else
+                {
+                    MessageBox.Show("No gamepad connected!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error while populating devices: {ex.Message}");
+            }
+        }
+        private void TGU1InputDeviceComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (TGU1InputDeviceComboBox.SelectedItem != null)
+            {
+                string selectedInputDevice = TGU1InputDeviceComboBox.SelectedItem.ToString();
+            }
+        }
+
         private void AddTGU1DeviceButton_Click(object sender, RoutedEventArgs e)
         {
             string TGU1LedCount = TGU1LEDCountTextBox.Text;
+            string TGU1InputDevice = TGU1InputDeviceComboBox.Text;
+
             if (int.TryParse(TGU1LedCount, out _))
             {
                 string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -56,6 +97,7 @@ namespace Sim_Wheel_Config.AddNewDevice
                     new XElement("LEDCount", TGU1LedCount),
                     new XElement("DeviceVID", TGU1VIDTextBox.Text),
                     new XElement("DevicePID", TGU1PIDTextBox.Text),
+                    new XElement("InputDevice", TGU1InputDevice),
                     new XElement("LED1", TGU1LED1CheckBox.IsChecked == true ? "true" : "false"),
                     new XElement("LED2", TGU1LED2CheckBox.IsChecked == true ? "true" : "false"),
                     new XElement("LED3", TGU1LED3CheckBox.IsChecked == true ? "true" : "false"),

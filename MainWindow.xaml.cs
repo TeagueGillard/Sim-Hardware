@@ -32,6 +32,8 @@ namespace Sim_Wheel_Config
         private string MainWindowDisplayCurrentDeviceComPort = "No Device";
         private string MainWindowDisplayDeviceStatus = "Not Connected";
         private string MainWindowDisplayCurrentDeviceStatus = "Not Connected";
+        private string MainWindowDisplayDeviceInputDevice = "0";
+        private string MainWindowDisplayCurrentDeviceInputDevice = "No Device";
         private FileSystemWatcher fileWatcher;
         private ColorPicker colorPicker;
         private DirectInput directInput;
@@ -136,6 +138,11 @@ namespace Sim_Wheel_Config
                     string devicePID = device.Element("DevicePID")?.Value;
                     string deviceVID = device.Element("DeviceVID")?.Value;
                     string deviceComPort = GetComPortFromVIDPID(deviceVID, devicePID);
+                    string deviceInputDevice = device.Element("InputDevice")?.Value;
+                    string LED1 = device.Element("LED1")?.Value;
+                    string LED2 = device.Element("LED2")?.Value;
+                    string LED3 = device.Element("LED3")?.Value;
+                    string LED4 = device.Element("LED4")?.Value;
 
                     // RGB Strip Page Setup
                     if (deviceType == "RGBStrip")
@@ -383,10 +390,6 @@ namespace Sim_Wheel_Config
                         };
                         MainGrid.Children.Add(image);
 
-                        string LED1 = device.Element("LED1")?.Value;
-                        string LED2 = device.Element("LED2")?.Value;
-                        string LED3 = device.Element("LED3")?.Value;
-                        string LED4 = device.Element("LED4")?.Value;
 
                         Button button = new Button()
                         {
@@ -411,7 +414,8 @@ namespace Sim_Wheel_Config
                             MainWindowDisplayDeviceName = deviceName;
                             MainWindowDisplayDeviceLEDCount = ledCount;
                             MainWindowDisplayDeviceComPort = deviceComPort;
-                            MainFrame.Navigate(new TGU1Page(deviceType, deviceID, deviceName, ledCount, deviceComPort, LED1, LED2, LED3, LED4));
+                            MainWindowDisplayDeviceInputDevice = deviceInputDevice;
+                            MainFrame.Navigate(new TGU1Page(deviceType, deviceID, deviceName, ledCount, deviceComPort, deviceInputDevice, LED1, LED2, LED3, LED4));
                         };
                         MainGrid.Children.Add(button);
                         verticalPosition += 20;

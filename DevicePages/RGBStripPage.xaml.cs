@@ -219,6 +219,33 @@ namespace Sim_Wheel_Config
             RegisterName(newButton.Name, newButton);
             RGBStripPageGrid.Children.Add(newButton);
         }
+        private void UpdateOrCreateDisconnectButton(string buttonName, string content, Thickness margin, double width, double height, string deviceComPort, string ledCount)
+        {
+
+            Button foundButton = (Button)RGBStripPageGrid.FindName(buttonName);
+
+            if (foundButton != null)
+            {
+                RGBStripPageGrid.Children.Remove(foundButton);
+                UnregisterName(buttonName);
+            }
+
+            Button newButton = new Button()
+            {
+                Name = buttonName,
+                Content = content,
+                Margin = margin,
+                Width = width,
+                Height = height,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+
+            newButton.Tag = new { deviceComPort, ledCount };
+            newButton.Click += DisconnectButton_Click;
+            RegisterName(newButton.Name, newButton);
+            RGBStripPageGrid.Children.Add(newButton);
+        }
         private void UpdateOrCreateDeleteButton(string buttonName, string content, Thickness margin, double width, double height, string device, string deviceName)
         {
 
@@ -377,6 +404,16 @@ namespace Sim_Wheel_Config
                 MainWindowDisplayDeviceStatus
                 );
 
+                UpdateOrCreateDisconnectButton(
+                "MainWindowDisplayDeviceConnectButton",
+                "Disconnect",
+                new Thickness(852, 111, 0, 0),
+                100,
+                20,
+                MainWindowDisplayDeviceComPort,
+                MainWindowDisplayDeviceLEDCount
+                );
+
                 AddColorPicker();
 
                 UpdateOrCreateRainbowWaveButton(
@@ -411,6 +448,12 @@ namespace Sim_Wheel_Config
                 Xceed.Wpf.Toolkit.MessageBox.Show($"Error opening COM port: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
+        }
+        private void DisconnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            _serialPort.Close();
+            RGBStripPage CheckDeviceConnectionNewPage = new RGBStripPage(MainWindowDisplayDeviceType, MainWindowDisplayDeviceID, MainWindowDisplayDeviceName, MainWindowDisplayDeviceLEDCount, MainWindowDisplayDeviceComPort);
+            NavigationService.Navigate(CheckDeviceConnectionNewPage);       // Creates a new page with same info as current page then navigatges to it ( Reloads the current page and resets the state)
         }
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
