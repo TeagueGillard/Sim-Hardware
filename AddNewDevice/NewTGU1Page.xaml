@@ -37,6 +37,9 @@
         <Label Content="LED Strip 4:" Foreground="White"  HorizontalAlignment="Left" Margin="760,119,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="TGU1LED4CheckBox" HorizontalAlignment="Left" Margin="845,125,0,0" VerticalAlignment="Top"/>
 
+        <Label Content="Input Device:" Foreground="White"  HorizontalAlignment="Left" Margin="337,148,0,0" VerticalAlignment="Top"/>
+        <ComboBox Name="TGU1InputDeviceComboBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="425,150,0,0" Width="200" Background="#FF090910" Foreground="Black" ></ComboBox>
+
 
         <Button x:Name="AddTGU1DeviceButton"  Content="Add TG - U1 Device" HorizontalAlignment="Left" Margin="806,160,0,0" VerticalAlignment="Top" Width="130" Click="AddTGU1DeviceButton_Click"/>
 

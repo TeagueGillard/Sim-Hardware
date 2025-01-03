@@ -14,7 +14,6 @@ namespace Sim_Wheel_Config.AddNewDevice
     {
         private DirectInput directInput;
         private Joystick joystick;
-        private JoystickState joystickState;
 
         public NewWheelPage()
         {
@@ -69,6 +68,7 @@ namespace Sim_Wheel_Config.AddNewDevice
         {
             string WheelLedCount = WheelLEDCountTextBox.Text;
             string WheelInputDevice = WheelInputDeviceComboBox.Text;
+
             if (int.TryParse(WheelLedCount, out _))
             {
                 string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);

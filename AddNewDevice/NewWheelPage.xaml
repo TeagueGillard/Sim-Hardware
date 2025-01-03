@@ -14,14 +14,19 @@
 
         <Label Content="Device Name:" Foreground="White"  HorizontalAlignment="Left" Margin="337,92,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="WheelDeviceNameTextBox"  HorizontalAlignment="Left" Margin="425,96,0,0" TextWrapping="NoWrap" Text="Device Name" VerticalAlignment="Top" Width="200" Background="#00000000" Foreground="White"/>
+        
         <Label Content="VID:" Foreground="White"  HorizontalAlignment="Left" Margin="630,92,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="WheelVIDTextBox"  HorizontalAlignment="Left" Margin="667,96,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White"/>
+        
         <Label Content="PID:" Foreground="White"  HorizontalAlignment="Left" Margin="722,92,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="WheelPIDTextBox"  HorizontalAlignment="Left" Margin="758,96,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White"/>
+        
         <Label Content="LED Count:" Foreground="White"  HorizontalAlignment="Left" Margin="813,92,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="WheelLEDCountTextBox"  HorizontalAlignment="Left" Margin="886,96,0,0" TextWrapping="NoWrap" Text="0" VerticalAlignment="Top" Width="50" Background="#00000000" Foreground="White" PreviewTextInput="WheelLEDCountTextBox_PreviewTextInput"/>
+        
         <Label Content="Input Device:" Foreground="White"  HorizontalAlignment="Left" Margin="337,133,0,0" VerticalAlignment="Top"/>
         <ComboBox Name="WheelInputDeviceComboBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="425,135,0,0" Width="200" Background="#FF090910" Foreground="Black" ></ComboBox>
+        
         <Button x:Name="AddWheelDeviceButton"  Content="Add New Wheel Device" HorizontalAlignment="Left" Margin="806,123,0,0" VerticalAlignment="Top" Width="130" Click="AddWheelDeviceButton_Click"/>
     </Grid>
 </Page>
