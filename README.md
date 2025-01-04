@@ -1,6 +1,9 @@
 # Sim Hardware
 Sim Hardware is an app that directly controls and adjusts your sim racing hardware without needing to reflash the firmware whenever you want to change a setting.
 
+> Device input display targeted for v0.1.0-alpha release!
+
+> Device Control Adjustments targeted for v0.2.0-beta release!
 ## Compatible Devices:
 | Device Name: | LED Support: | Input Display: | Control Adjustments: |
 | --- | --- | --- | --- |
