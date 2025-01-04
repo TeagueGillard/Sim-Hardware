@@ -44,15 +44,15 @@ namespace Sim_Wheel_Config
         {
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
-            string filePath = System.IO.Path.Combine(folderPath, "devices.xml");
+            string filePath = System.IO.Path.Combine(folderPath, "devices.xml");    // Sets file path to the devices.xml
 
-            fileWatcher = new FileSystemWatcher(folderPath, "devices.xml")
+            fileWatcher = new FileSystemWatcher(folderPath, "devices.xml")  // Creatges a filewatcher to check when devices.xml is updated
             {
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
                 EnableRaisingEvents = true
             };
 
-            fileWatcher.Changed += (sender, e) =>
+            fileWatcher.Changed += (sender, e) =>   // Runs UpadateDevices() when devices.xml is changed
             {
                 Dispatcher.Invoke(() =>
                 {
@@ -76,7 +76,7 @@ namespace Sim_Wheel_Config
             _timer.Start();
             UpdateDevicesConnected();
             UpdateDevices();
-            VersionNoLabel.Content = "v0.0.5-alpha";
+            VersionNoLabel.Content = "v0.0.6-alpha";                                        // ---------- UPDATE VERSION NUMBER HERE ----------
             MainFrameInstance = MainFrame;
         }
 
@@ -111,25 +111,27 @@ namespace Sim_Wheel_Config
             string folderPath = System.IO.Path.Combine(documentsPath, "Sim Hardware");
             string filePath = System.IO.Path.Combine(folderPath, "devices.xml");
 
-            List<UIElement> elementsToRemove = MainGrid.Children
+            ScrollViewer scrollViewer = MainGrid.Children.OfType<ScrollViewer>().FirstOrDefault();
+            StackPanel stackPanel = scrollViewer.Content as StackPanel;
+
+            List<UIElement> elementsToRemove = stackPanel.Children
                 .OfType<UIElement>()
                 .Where(child =>
-                    (child is Label label && label.Tag?.ToString() == "DeviceLabel") ||
-                    (child is Button button && button.Tag != null) ||
-                    (child is Image image))
+                    (child is Grid grid && grid.Tag?.ToString() == "DeviceItem"))
                 .ToList();
 
             foreach (UIElement element in elementsToRemove)
             {
-                MainGrid.Children.Remove(element);
+                stackPanel.Children.Remove(element);    // Removes current devices from the stackpanel so they can be redrawn without duplicating
             }
+
 
             if (System.IO.File.Exists(filePath))
             {
                 XDocument doc = XDocument.Load(filePath);
                 int verticalPosition = 70;
 
-                foreach (XElement device in doc.Descendants("Device"))
+                foreach (XElement device in doc.Descendants("Device"))  // Retrieves device info for each device from devices.xml
                 {
                     string deviceType = device.Element("DeviceType")?.Value;
                     string deviceID = device.Attribute("id")?.Value;
@@ -144,86 +146,83 @@ namespace Sim_Wheel_Config
                     string LED3 = device.Element("LED3")?.Value;
                     string LED4 = device.Element("LED4")?.Value;
 
-                    // RGB Strip Page Setup
+
+                    Grid DeviceItemGrid = new Grid()
+                    {
+                        Tag = "DeviceItem",
+                        Margin = new Thickness(20, 10, 10, 0),
+                        Width = 200,
+                        Height = 95
+                    };
+                    LinearGradientBrush gradientBrush = new LinearGradientBrush();  // Fancy gradient for the device buttons
+                    gradientBrush.StartPoint = new Point(0, 0);
+                    gradientBrush.EndPoint = new Point(1, 0);
+                    gradientBrush.GradientStops.Add(new GradientStop(Color.FromArgb(0, 0, 0, 0), 0));
+                    gradientBrush.GradientStops.Add(new GradientStop(Color.FromArgb(255, 60, 60, 60), 1));
+                    DeviceItemGrid.Background = gradientBrush;
+
+
+                    // RGB Strip Button Setup
                     if (deviceType == "RGBStrip")
                     {
-                        MainGrid.Children.Add(new Label()
+                        Label deviceNameLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
                             Content = deviceName,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(40, verticalPosition, 0, 0),
+                            Margin = new Thickness(20, 0, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(deviceNameLabel);
 
-                        MainGrid.Children.Add(new Label()
+                        Label deviceTypeLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
                             Content = "RGB Strip Device",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 120),
+                            Margin = new Thickness(30, 20, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(deviceTypeLabel);
 
-                        MainGrid.Children.Add(new Label()
+                        Label ledCountLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
                             Content = $"{ledCount} Leds",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 40),
+                            Margin = new Thickness(30, 40, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(ledCountLabel);
 
-                        MainGrid.Children.Add(new Label()
+                        Label comPortLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
                             Content = deviceComPort,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 0),
+                            Margin = new Thickness(30, 60, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(comPortLabel);
 
                         Image image = new Image()
                         {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
                             Height = 120,
                             Width = 120,
-                            Margin = new Thickness(130, verticalPosition - 70, 0, 0),
+                            Margin = new Thickness(100, 10, 0, 0),
                             Source = new BitmapImage(new Uri("pack://application:,,,/Resources/RGB-STRIP.png"))
                         };
-                        MainGrid.Children.Add(image);
-
+                        DeviceItemGrid.Children.Add(image);
+                        
                         Button button = new Button()
                         {
                             Content = "",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(30, verticalPosition - 80, 0, 0),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                            Margin = new Thickness(0),
                             Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
                             Width = 200,
                             Height = 95,
-                            Tag = deviceName,
+                            Tag = deviceName
                         };
                         button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
                         button.Click += (sender, e) =>
                         {
                             DisconnectComPort();
-                            string deviceStatus = "Not Connected";
                             MainWindowDisplayDeviceType = deviceType;
                             MainWindowDisplayDeviceID = deviceID;
                             MainWindowDisplayDeviceName = deviceName;
@@ -231,85 +230,69 @@ namespace Sim_Wheel_Config
                             MainWindowDisplayDeviceComPort = deviceComPort;
                             MainFrame.Navigate(new RGBStripPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
                         };
-                        MainGrid.Children.Add(button);
 
-                        verticalPosition += 20;
+                        DeviceItemGrid.Children.Add(button);
+                        stackPanel.Children.Add(DeviceItemGrid);
+                        scrollViewer.Content = stackPanel;
+
                     }
 
-                    // Wheel Page Setup
+                    // Wheel Button Setup
                     if (deviceType == "Wheel")
                     {
-                        MainGrid.Children.Add(new Label()
+                        Label deviceNameLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
                             Content = deviceName,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(40, verticalPosition, 0, 0),
+                            Margin = new Thickness(20, 0, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(deviceNameLabel);
 
-                        MainGrid.Children.Add(new Label()
+                        Label deviceTypeLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
                             Content = "Wheel",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 120),
+                            Margin = new Thickness(30, 20, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(deviceTypeLabel);
 
-                        MainGrid.Children.Add(new Label()
+                        Label ledCountLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
                             Content = $"{ledCount} Leds",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 40),
+                            Margin = new Thickness(30, 40, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(ledCountLabel);
 
-                        MainGrid.Children.Add(new Label()
+                        Label comPortLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
                             Content = deviceComPort,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 0),
+                            Margin = new Thickness(30, 60, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(comPortLabel);
 
                         Image image = new Image()
                         {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
                             Height = 100,
                             Width = 100,
-                            Margin = new Thickness(130, verticalPosition - 55, 0, 0),
+                            Margin = new Thickness(105, 30, 0, 0),
                             Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Alpine_Wheel.png"))
                         };
-                        MainGrid.Children.Add(image);
+                        DeviceItemGrid.Children.Add(image);
 
                         Button button = new Button()
                         {
                             Content = "",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(30, verticalPosition - 80, 0, 0),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                            Margin = new Thickness(0),
                             Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
                             Width = 200,
                             Height = 95,
-                            Tag = deviceName,
+                            Tag = deviceName
                         };
                         button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
                         button.Click += (sender, e) =>
@@ -323,86 +306,69 @@ namespace Sim_Wheel_Config
                             MainWindowDisplayDeviceComPort = deviceComPort;
                             MainFrame.Navigate(new WheelPage(deviceType, deviceID, deviceName, ledCount, deviceComPort));
                         };
-                        MainGrid.Children.Add(button);
 
-                        verticalPosition += 20;
+                        DeviceItemGrid.Children.Add(button);
+                        stackPanel.Children.Add(DeviceItemGrid);
+                        scrollViewer.Content = stackPanel;
 
                     }
 
+                    // TG-U1 Button Setup
                     if (deviceType == "TGU1")
                     {
-                        MainGrid.Children.Add(new Label()
+                        Label deviceNameLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
                             Content = deviceName,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(40, verticalPosition, 0, 0),
+                            Margin = new Thickness(20, 0, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(deviceNameLabel);
 
-                        MainGrid.Children.Add(new Label()
+                        Label deviceTypeLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
-                            Content = "TG - U1 Device",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 120),
+                            Content = "TG - U1",
+                            Margin = new Thickness(30, 20, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(deviceTypeLabel);
 
-                        MainGrid.Children.Add(new Label()
+                        Label ledCountLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
                             Content = $"{ledCount} Leds",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 40),
+                            Margin = new Thickness(30, 40, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(ledCountLabel);
 
-                        MainGrid.Children.Add(new Label()
+                        Label comPortLabel = new Label()
                         {
-                            Tag = "DeviceLabel",
                             Content = deviceComPort,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(50, verticalPosition, 0, 0),
+                            Margin = new Thickness(30, 60, 0, 0),
                             FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
-                        });
-                        verticalPosition += 20;
+                            Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                        };
+                        DeviceItemGrid.Children.Add(comPortLabel);
 
                         Image image = new Image()
                         {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Height = 120,
-                            Width = 120,
-                            Margin = new Thickness(130, verticalPosition - 70, 0, 0),
-                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/RGB-STRIP.png"))
+                            Height = 75,
+                            Width = 75,
+                            Margin = new Thickness(125, 10, 0, 0),
+                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/TG-U1.png"))
                         };
-                        MainGrid.Children.Add(image);
-
+                        DeviceItemGrid.Children.Add(image);
 
                         Button button = new Button()
                         {
                             Content = "",
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Margin = new Thickness(30, verticalPosition - 80, 0, 0),
-                            FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                            Margin = new Thickness(0),
                             Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
                             Width = 200,
                             Height = 95,
-                            Tag = deviceName,
+                            Tag = deviceName
                         };
                         button.Template = (ControlTemplate)this.FindResource("NoMouseOverButtonTemplate");
                         button.Click += (sender, e) =>
@@ -417,20 +383,25 @@ namespace Sim_Wheel_Config
                             MainWindowDisplayDeviceInputDevice = deviceInputDevice;
                             MainFrame.Navigate(new TGU1Page(deviceType, deviceID, deviceName, ledCount, deviceComPort, deviceInputDevice, LED1, LED2, LED3, LED4));
                         };
-                        MainGrid.Children.Add(button);
-                        verticalPosition += 20;
+
+                        DeviceItemGrid.Children.Add(button);
+                        stackPanel.Children.Add(DeviceItemGrid);
+                        scrollViewer.Content = stackPanel;
 
                     }
+
+
+
                 }
             }
         }
 
-        private void AddNewDevice_Click(object sender, RoutedEventArgs e)
+        private void AddNewDevice_Click(object sender, RoutedEventArgs e)   // Opens the Add New Device Page when the Add New Device button is clicked
         {
             MainFrame.Navigate(new AddNewDevice.NewDevicePage());
         }
 
-        public static string GetComPortFromVIDPID(string vid, string pid)
+        public static string GetComPortFromVIDPID(string vid, string pid)   // Gets the COM port from the VID and PID of the device
         {
             string comPort = null;
             string searchPattern = $"VID_{vid}&PID_{pid}";
@@ -478,7 +449,7 @@ namespace Sim_Wheel_Config
         }
 
 
-        protected override void OnClosed(EventArgs e)
+        protected override void OnClosed(EventArgs e)   // Closes the serial port and joystick if needed when the program is closed
         {
             if (_serialPort != null && _serialPort.IsOpen)
             {
