@@ -7,9 +7,6 @@ using System.Xml.Linq;
 
 namespace Sim_Wheel_Config.AddNewDevice
 {
-    /// <summary>
-    /// Interaction logic for NewWheelPage.xaml
-    /// </summary>
     public partial class NewWheelPage : Page
     {
         private DirectInput directInput;

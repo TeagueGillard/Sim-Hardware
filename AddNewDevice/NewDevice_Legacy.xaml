@@ -19,27 +19,9 @@
         </LinearGradientBrush>
     </Window.Background>
 
-    <Window.Resources>
-        <ControlTemplate x:Key="NoMouseOverButtonTemplate" TargetType="Button">
-            <Border Background="{TemplateBinding Background}"  
-                BorderBrush="{TemplateBinding BorderBrush}"  
-                BorderThickness="{TemplateBinding BorderThickness}">
-                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"  
-                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-            </Border>
-
-            <ControlTemplate.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="{x:Static SystemColors.ControlLightBrush}" />
-                    <Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}" />
-                </Trigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
-    </Window.Resources>
-
     <Grid>
         <!-- RGB Strip -->
-        <Button Content="RGB Strip" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,45,0,0" Height="69" Width="187" Background="#FF292929" Foreground="White" Template="{StaticResource NoMouseOverButtonTemplate}" />
+        <Button Content="RGB Strip" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,45,0,0" Height="69" Width="187" Background="#FF292929" Foreground="White"  />
         <Label Content="Device Name:" Foreground="White"  HorizontalAlignment="Left" Margin="286,40,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="RGBStripDeviceNameTextBox"  HorizontalAlignment="Left" Margin="374,45,0,0" TextWrapping="NoWrap" Text="Device Name" VerticalAlignment="Top" Width="200" Background="#00000000" Foreground="White"/>
         <Label Content="VID:" Foreground="White"  HorizontalAlignment="Left" Margin="337,65,0,0" VerticalAlignment="Top"/>
@@ -51,7 +33,7 @@
         <Button x:Name="RGBAddRGBStripDeviceButton"  Content="Add RGB Strip Device" HorizontalAlignment="Left" Margin="444,119,0,0" VerticalAlignment="Top" Width="130" Click="RGBAddRGBStripDeviceButton_Click"/>
 
         <!-- Wheel -->
-        <Button Content="Wheel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,155,0,0" Height="69" Width="187" Background="#FF292929" Foreground="White" Template="{StaticResource NoMouseOverButtonTemplate}"/>
+        <Button Content="Wheel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,155,0,0" Height="69" Width="187" Background="#FF292929" Foreground="White" />
         <Label Content="Device Name:" Foreground="White"  HorizontalAlignment="Left" Margin="286,150,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="WheelDeviceNameTextBox"  HorizontalAlignment="Left" Margin="374,155,0,0" TextWrapping="NoWrap" Text="Device Name" VerticalAlignment="Top" Width="200" Background="#00000000" Foreground="White"/>
         <Label Content="VID:" Foreground="White"  HorizontalAlignment="Left" Margin="337,177,0,0" VerticalAlignment="Top"/>
@@ -63,7 +45,7 @@
         <Button x:Name="AddWheelDeviceButton"  Content="Add Wheel Device" HorizontalAlignment="Left" Margin="444,229,0,0" VerticalAlignment="Top" Width="130" Click="AddWheelDeviceButton_Click"/>
 
         <!-- Dash -->
-        <Button Content="Dash" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,270,0,0" Height="69" Width="187" Background="#FF292929" Foreground="White" Template="{StaticResource NoMouseOverButtonTemplate}"/>
+        <Button Content="Dash" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,270,0,0" Height="69" Width="187" Background="#FF292929" Foreground="White" />
     </Grid>
 
 </Window>

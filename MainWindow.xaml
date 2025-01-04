@@ -13,10 +13,14 @@
         Icon="Resources/icon.ico">
 
     <Window.Background>
+        
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+            
             <GradientStop Color="#FF121220"/>
             <GradientStop Color="#FF090910" Offset="1"/>
+            
         </LinearGradientBrush>
+        
     </Window.Background>
 
     <Grid x:Name="MainGrid">
@@ -37,28 +41,39 @@
         <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-2000, 0, -2000, 16" Width="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Width}" Height="1"/>
         <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="55,0,0,66" Width="140" Height="1"/>
         <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
+        
+        <!-- Device display area with scroll bar -->
+        <ScrollViewer x:Name="scrollViewer" VerticalScrollBarVisibility="Auto" Margin="0,60,720,75">
+            <StackPanel x:Name="stackPanel" Orientation="Vertical">
+                
+            </StackPanel>
+        </ScrollViewer>
 
     </Grid>
+    
+    <!-- Transparent button template for device button -->
     <Window.Resources>
-        <ControlTemplate x:Key="NoMouseOverButtonTemplate"   
-                 TargetType="Button">
-            <Border Background="{TemplateBinding Background}"  
-          BorderBrush="{TemplateBinding BorderBrush}"  
-          BorderThickness="{TemplateBinding BorderThickness}">
-                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"  
-                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-            </Border>
+    <ControlTemplate x:Key="NoMouseOverButtonTemplate" TargetType="Button">
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="Transparent"
+                BorderThickness="1">
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Border>
 
-            <ControlTemplate.Triggers>
-                <Trigger Property="IsEnabled"  
-             Value="False">
-                    <Setter Property="Background"  
-              Value="{x:Static SystemColors.ControlLightBrush}" />
-                    <Setter Property="Foreground"  
-              Value="{x:Static SystemColors.GrayTextBrush}" />
-                </Trigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
-    </Window.Resources>
+        <ControlTemplate.Triggers>
+
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="LightGray" />
+            </Trigger>
+
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="Gray" />
+                <Setter Property="Foreground" Value="DarkGray" />
+            </Trigger>
+            
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+</Window.Resources>
 
 </Window>
