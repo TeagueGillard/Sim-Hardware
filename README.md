@@ -4,11 +4,14 @@ Sim Hardware is an app that directly controls and adjusts your sim racing hardwa
 ## Compatible Devices:
 | Device Name: | LED Support: | Input Display: | Control Adjustments: |
 | --- | --- | --- | --- |
-| [TG - U1](https://github.com/TeagueGillard/TG-U1) | Full Led Support | Coming Soon! | Coming Soon! |
-| TG - 911-GT3-R | No LEDS | Coming Soon! | Not Supported |
-| TG - MCL22 | Full Led Support | Coming Soon! | Not Supported |
-| TG - A523 | Full Led Support | Coming Soon! | Not Supported |
-| TG - W13 | Full Led Support | Coming Soon! | Coming Soon! |
-| TG - FE22 | Full Led Support | Coming Soon! | Coming Soon! |
+| [TG - U1](https://github.com/TeagueGillard/TG-U1) | :white_check_mark: | :white_check_mark: | :soon: |
+| TG - W13 | :white_check_mark: | :white_check_mark: | :soon: |
+| TG - FE22 | :white_check_mark: | :white_check_mark: | :soon: |
+| TG - A523 | :white_check_mark: | :soon: | :x: |
+| TG - MCL22 | :white_check_mark: | :soon: | :x: |
+| TG - 911-GT3-R | :x: | :soon: | :x: |
+
+
+
 
 > If you would like your device added, please get in touch with me [here](mailto:teaguegillard@gmail.com) or create a [Pull Request](https://github.com/TeagueGillard/Sim-Hardware/pulls)
