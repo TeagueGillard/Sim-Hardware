@@ -1,9 +1,11 @@
 ﻿using SharpDX.DirectInput;
 using System.IO;
 using System.IO.Ports;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using Xceed.Wpf.Toolkit;
@@ -42,6 +44,10 @@ namespace Sim_Wheel_Config
         private ColorPicker colorPicker2;
         private ColorPicker colorPicker3;
         private ColorPicker colorPicker4;
+        private DirectInput directInput;
+        private Joystick joystick;
+        private DispatcherTimer _gamepadInputTimer;
+        private List<Ellipse> buttonCircles = new List<Ellipse>();
 
 
         public TGU1Page(string deviceType, string deviceID, string deviceName, string ledCount, string deviceComPort, string inputDevice, string LED1, string LED2, string LED3, string LED4)
@@ -229,7 +235,7 @@ namespace Sim_Wheel_Config
                 VerticalAlignment = VerticalAlignment.Top,
             };
 
-            newButton.Tag = new { deviceComPort, ledCount };
+            newButton.Tag = new { deviceComPort, ledCount, MainWindowDisplayCurrentDeviceID };
             newButton.Click += ConnectButton_Click;
             RegisterName(newButton.Name, newButton);
             TGU1PageGrid.Children.Add(newButton);
@@ -700,6 +706,7 @@ namespace Sim_Wheel_Config
             {
                 Xceed.Wpf.Toolkit.MessageBox.Show($"Error opening COM port: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            InitializeGamepad(MainWindowDisplayDeviceInputDevice);
 
         }
         private void DisconnectButton_Click(object sender, RoutedEventArgs e)
@@ -1170,6 +1177,82 @@ namespace Sim_Wheel_Config
             }
         }
 
+        private void InitializeGamepad(string inputDevice)
+        {
+            directInput = new DirectInput();
+            var devices = directInput.GetDevices(DeviceType.Gamepad, DeviceEnumerationFlags.AllDevices);
+            var joystickdevice = devices.FirstOrDefault(d => d.InstanceName == inputDevice);
+            if (joystickdevice != null)
+            {
+                var joystick = new Joystick(directInput, joystickdevice.InstanceGuid);
+                ScanJoystickInputs(joystick);
+            } else {
+                MessageBox.Show("Gamepad not found. Please make sure the gamepad is connected and the device is set correctly!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ScanJoystickInputs(Joystick joystick)
+        {
+                joystick.Acquire();
+                joystick.Poll();
+                var state = joystick.GetCurrentState();
+
+                for (int i = 0; i < state.Buttons.Length; i++)
+                {
+                    // display buttons
+                    Ellipse button = new Ellipse()
+                    {
+                        Width = 20,
+                        Height = 20,
+                        Fill = Brushes.Gray,
+                        Stroke = Brushes.Black,
+                        StrokeThickness = 2
+                    };
+
+                    double x = 295 + (i % 16) * 42;
+                    double y = 340 + (i / 16) * 20;
+
+                    Canvas.SetLeft(button, x);
+                    Canvas.SetTop(button, y);
+
+                    ButtonCanvas.Children.Add(button);
+                    buttonCircles.Add(button);
+
+                }
+                joystick.Unacquire();
+                StartgamepadInputTimer(joystick);
+        }
+
+        private void StartgamepadInputTimer(Joystick joystick)
+        {
+            _gamepadInputTimer = new DispatcherTimer();
+            _gamepadInputTimer.Interval = TimeSpan.FromMilliseconds(10);
+            _gamepadInputTimer.Tick += (sender, e) => UpdateJoystickInputs(joystick);
+            _gamepadInputTimer.Start();
+        }
+
+        private void UpdateJoystickInputs(Joystick joystick)
+        {
+            if (joystick == null)
+            {
+                MessageBox.Show("Gamepad not found. Please make sure the gamepad is connected and the device is set correctly!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            joystick.Acquire();
+            joystick.Poll();
+            var state = joystick.GetCurrentState();
+            for (int i = 0; i < state.Buttons.Length; i++)
+            {
+                if (state.Buttons[i])
+                {
+                    buttonCircles[i].Fill = Brushes.Red;
+                } else {
+                    buttonCircles[i].Fill = Brushes.Gray;
+                }
+            }
+            joystick.Unacquire();
+        }
+
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             _deviceCheckTimer?.Stop();
@@ -1177,6 +1260,7 @@ namespace Sim_Wheel_Config
             {
                 _serialPort.Close();
             }
+
         }
     }
 }

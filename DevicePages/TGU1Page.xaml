@@ -8,5 +8,8 @@
       Title="TGU1Page">
 
     <Grid x:Name="TGU1PageGrid">
+        <Canvas Name="ButtonCanvas" Background="Transparent">
+            
+        </Canvas>
     </Grid>
 </Page>
