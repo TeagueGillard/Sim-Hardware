@@ -994,30 +994,35 @@ namespace Sim_Wheel_Config
 
             var buttonData = (dynamic)clickedButton.Tag;
             string command = buttonData.command;
-            string Switch = TGU1SwitchComboBox.SelectedItem.ToString();
-            string Option = TGU1OptionComboBox.SelectedItem.ToString();
+            ComboBox TGU1SwitchComboBox = (ComboBox)TGU1PageGrid.FindName("TGU1SwitchComboBox");
+            ComboBox TGU1OptionComboBox = (ComboBox)TGU1PageGrid.FindName("TGU1OptionComboBox");
 
-
-
-
-            // Open the selected COM port
-            try
+            if (TGU1SwitchComboBox.SelectedItem != null || TGU1OptionComboBox.SelectedItem != null)
             {
-                if (_serialPort != null && _serialPort.IsOpen)
+                string Switch = TGU1SwitchComboBox.SelectedItem.ToString();
+                string Option = TGU1OptionComboBox.SelectedItem.ToString();
+                try
                 {
-                    _serialPort.WriteLine($"{Switch}, {Option},"); // Send the command to Arduino to start rainbow wave
-                    _serialPort.Close();    // Close serial port so SimHub can communicate with the Arduino
-
+                    if (_serialPort != null && _serialPort.IsOpen)
+                    {
+                        _serialPort.WriteLine($"{Switch}, {Option},"); // Send the command to Arduino to set the Switch to the Option
+                        MessageBox.Show($"Command Sent: {Switch}, {Option}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        Xceed.Wpf.Toolkit.MessageBox.Show("COM port is not open.");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Xceed.Wpf.Toolkit.MessageBox.Show("COM port is not open.");
+                    Xceed.Wpf.Toolkit.MessageBox.Show($"Error opening COM port: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-            }
-            catch (Exception ex)
+            } else
             {
-                Xceed.Wpf.Toolkit.MessageBox.Show($"Error opening COM port: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Please select a switch and option before sending.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
+            
 
         }
 
