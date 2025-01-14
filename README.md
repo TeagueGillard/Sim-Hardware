@@ -4,7 +4,7 @@ Sim Hardware is an app that directly controls and adjusts your sim racing hardwa
 ## Compatible Devices:
 | Device Name: | LED Support: | Input Display: | Control Adjustments: |
 | --- | --- | --- | --- |
-| [TG - U1](https://github.com/TeagueGillard/TG-U1) | :white_check_mark: | :white_check_mark: | :soon: |
+| [TG - U1](https://github.com/TeagueGillard/TG-U1) | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | TG - W13 | :white_check_mark: | :white_check_mark: | :soon: |
 | TG - FE22 | :white_check_mark: | :white_check_mark: | :soon: |
 | TG - A523 | :white_check_mark: | :soon: | :x: |
