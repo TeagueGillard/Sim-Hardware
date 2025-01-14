@@ -430,6 +430,71 @@ namespace Sim_Wheel_Config
             RegisterName(newButton.Name, newButton);
             TGU1PageGrid.Children.Add(newButton);
         }
+
+        private void UpdateOrCreateCommandBox(string buttonName, string content, Thickness margin, double width, double height, string command)
+        {
+
+            Button foundButton = (Button)TGU1PageGrid.FindName(buttonName);
+
+            if (foundButton != null)
+            {
+                TGU1PageGrid.Children.Remove(foundButton);
+                UnregisterName(buttonName);
+            }
+
+            ComboBox switchComboBox = new ComboBox()
+            {
+                Name = "TGU1SwitchComboBox",
+                Margin = new Thickness(300, 511, 0, 0),
+                Width = 200,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+            RegisterName(switchComboBox.Name, switchComboBox);
+            TGU1PageGrid.Children.Add(switchComboBox);
+            ComboBox TGU1SwitchComboBox = (ComboBox)TGU1PageGrid.FindName("TGU1SwitchComboBox");
+            TGU1SwitchComboBox.Items.Add("Encoder 1");
+            TGU1SwitchComboBox.Items.Add("Encoder 2");
+            TGU1SwitchComboBox.Items.Add("Encoder 3");
+            TGU1SwitchComboBox.Items.Add("Encoder 4");
+            TGU1SwitchComboBox.Items.Add("Encoder 5");
+            TGU1SwitchComboBox.Items.Add("Encoder 6");
+            TGU1SwitchComboBox.Items.Add("Encoder 7");
+            TGU1SwitchComboBox.Items.Add("Encoder 8");
+
+            ComboBox optionComboBox = new ComboBox()
+            {
+                Name = "TGU1OptionComboBox",
+                Margin = new Thickness(510,511,0,0),
+                Width = 200,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+            RegisterName(optionComboBox.Name, optionComboBox);
+            TGU1PageGrid.Children.Add(optionComboBox);
+            ComboBox TGU1OptionComboBox = (ComboBox)TGU1PageGrid.FindName("TGU1OptionComboBox");
+            TGU1OptionComboBox.Items.Add("Absolute");
+            TGU1OptionComboBox.Items.Add("Incremental");
+
+
+            Button newButton = new Button()
+            {
+                Name = buttonName,
+                Content = command,
+                Margin = new Thickness(725, 511, 0, 0),
+                Width = 75,
+                Height = height,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+
+            newButton.Tag = new { command };
+            newButton.Click += SendCommand_Click;
+            RegisterName(switchComboBox.Name, switchComboBox);
+            RegisterName(newButton.Name, newButton);
+            TGU1PageGrid.Children.Add(newButton);
+        }
+
         private void UpdateOrCreateSendColorButton1(string buttonName, string content, Thickness margin, double width, double height, string command)
         {
 
@@ -701,6 +766,15 @@ namespace Sim_Wheel_Config
                 "Simhub"
                 );
 
+                UpdateOrCreateCommandBox(
+                "MainWindowDisplayCommandBox",
+                "Commands Here",
+                new Thickness(600, 111, 0, 0),
+                200,
+                20,
+                "Send"
+                );
+
             }
             catch (Exception ex)
             {
@@ -873,9 +947,6 @@ namespace Sim_Wheel_Config
 
         }
 
-
-
-
         private void SimhubButton_Click(object sender, RoutedEventArgs e)
         {
             Button clickedButton = (Button)sender;
@@ -916,6 +987,45 @@ namespace Sim_Wheel_Config
             }
 
         }
+
+        private void SendCommand_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = (Button)sender;
+
+            var buttonData = (dynamic)clickedButton.Tag;
+            string command = buttonData.command;
+            ComboBox TGU1SwitchComboBox = (ComboBox)TGU1PageGrid.FindName("TGU1SwitchComboBox");
+            ComboBox TGU1OptionComboBox = (ComboBox)TGU1PageGrid.FindName("TGU1OptionComboBox");
+
+            if (TGU1SwitchComboBox.SelectedItem != null || TGU1OptionComboBox.SelectedItem != null)
+            {
+                string Switch = TGU1SwitchComboBox.SelectedItem.ToString();
+                string Option = TGU1OptionComboBox.SelectedItem.ToString();
+                try
+                {
+                    if (_serialPort != null && _serialPort.IsOpen)
+                    {
+                        _serialPort.WriteLine($"{Switch}, {Option},"); // Send the command to Arduino to set the Switch to the Option
+                        MessageBox.Show($"Command Sent: {Switch}, {Option}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        Xceed.Wpf.Toolkit.MessageBox.Show("COM port is not open.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Xceed.Wpf.Toolkit.MessageBox.Show($"Error opening COM port: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            } else
+            {
+                MessageBox.Show("Please select a switch and option before sending.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            
+
+        }
+
         private void SendColorButton1_Click(object sender, RoutedEventArgs e)
         {
 
