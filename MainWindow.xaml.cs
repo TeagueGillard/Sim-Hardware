@@ -76,7 +76,7 @@ namespace Sim_Wheel_Config
             _timer.Start();
             UpdateDevicesConnected();
             UpdateDevices();
-            VersionNoLabel.Content = "v0.0.6-alpha";                                        // ---------- UPDATE VERSION NUMBER HERE ----------
+            VersionNoLabel.Content = "v1.0-release";                                        // ---------- UPDATE VERSION NUMBER HERE ----------
             MainFrameInstance = MainFrame;
         }
 
