@@ -1348,19 +1348,24 @@ namespace Sim_Wheel_Config
                 MessageBox.Show("Gamepad not found. Please make sure the gamepad is connected and the device is set correctly!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            joystick.Acquire();
-            joystick.Poll();
-            var state = joystick.GetCurrentState();
-            for (int i = 0; i < state.Buttons.Length; i++)
+            else
             {
-                if (state.Buttons[i])
+                joystick.Acquire();
+                joystick.Poll();
+                var state = joystick.GetCurrentState();
+                for (int i = 0; i < state.Buttons.Length; i++)
                 {
-                    buttonCircles[i].Fill = Brushes.Red;
-                } else {
-                    buttonCircles[i].Fill = Brushes.Gray;
+                    if (state.Buttons[i])
+                    {
+                        buttonCircles[i].Fill = Brushes.Red;
+                    }
+                    else
+                    {
+                        buttonCircles[i].Fill = Brushes.Gray;
+                    }
                 }
+                joystick.Unacquire();
             }
-            joystick.Unacquire();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

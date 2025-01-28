@@ -8,7 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Sim_Wheel_Config"
         mc:Ignorable="d"
-        Title="Sim Hardware | ALPHA"
+        Title="Sim Hardware"
         ResizeMode="NoResize"
         Icon="Resources/icon.ico">
 
