@@ -16,4 +16,4 @@ Sim Hardware is an app that directly controls and adjusts your sim racing hardwa
 
 
 
-> If you would like your device added, please get in touch with me [here](mailto:teaguegillard@gmail.com) or create a [Pull Request](https://github.com/TeagueGillard/Sim-Hardware/pulls)
+> If you would like your device added, please create a [Pull Request](https://github.com/TeagueGillard/Sim-Hardware/pulls)
